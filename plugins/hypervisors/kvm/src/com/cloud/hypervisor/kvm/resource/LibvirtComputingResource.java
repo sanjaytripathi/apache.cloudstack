@@ -189,6 +189,7 @@ import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.ConsoleDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.CpuTuneDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.DevicesDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.DiskDef;
+import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.DiskDef.deviceType;
 import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.DiskDef.diskProtocol;
 import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.FeaturesDef;
 import com.cloud.hypervisor.kvm.resource.LibvirtVMDef.FilesystemDef;
@@ -4549,15 +4550,19 @@ ServerResource {
             List<DiskDef> disks = getDisks(conn, vmName);
 
             for (DiskDef disk : disks) {
-                DomainBlockStats blockStats = dm.blockStats(disk.getDiskLabel());
-                String path = disk.getDiskPath(); // for example, path = /mnt/pool_uuid/disk_path/
-                String diskPath = null;
-                if (path != null) {
-                    String[] token = path.split("/");
-                    if (token.length > 3) {
-                        diskPath = token[3];
-                        VmDiskStatsEntry stat = new VmDiskStatsEntry(vmName, diskPath, blockStats.wr_req, blockStats.rd_req, blockStats.wr_bytes, blockStats.rd_bytes);
-                        stats.add(stat);
+                if (disk.getDeviceType().equals(deviceType.DISK)) {
+                    DomainBlockStats blockStats = dm.blockStats(disk.getDiskLabel());
+                    String path = disk.getDiskPath();
+                    String diskPath = null;
+                    if (path != null) {
+                        if (path.startsWith("rbd:"))    // path = rbd:/mnt/pool_uuid/disk_path/
+                            path = path.replace("rbd:", "");
+                        String[] token = path.split("/"); // path = /mnt/pool_uuid/disk_path/
+                        if (token.length > 3) {
+                            diskPath = token[3];
+                            VmDiskStatsEntry stat = new VmDiskStatsEntry(vmName, diskPath, blockStats.wr_req, blockStats.rd_req, blockStats.wr_bytes, blockStats.rd_bytes);
+                            stats.add(stat);
+                        }
                     }
                 }
             }
