@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<!DOCTYPE authorgroup PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY % BOOK_ENTITIES SYSTEM "ACS101.ent">
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "cloudstack.ent">
 %BOOK_ENTITIES;
 ]>
 
@@ -22,11 +22,11 @@
  under the License.
 -->
 
-
-<authorgroup>
-    <author>
-        <firstname>Sebastien</firstname>
-        <surname>Goasguen</surname>
-    </author>
-</authorgroup>
-
+<section id="jcloudscli">
+    <title>jClouds CLI</title>
+    <para>DevCloud is the &PRODUCT; sandbox. It is provided as a Virtual Box appliance. It is meant to be used as a development environment to easily test new &PRODUCT; development. It has also been used for training and &PRODUCT; demos since it provides a <emphasis>Cloud in a box</emphasis>.</para>
+    <note>
+        <para>DevCloud is provided as a convenience by community members. It is not an official &PRODUCT; release artifact.</para>
+        <para>The &PRODUCT; source code however, contains tools to build your own DevCloud.</para>
+    </note>
+</section>

@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<!DOCTYPE authorgroup PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY % BOOK_ENTITIES SYSTEM "ACS101.ent">
 %BOOK_ENTITIES;
 ]>
@@ -23,10 +23,17 @@
 -->
 
 
-<authorgroup>
-    <author>
-        <firstname>Sebastien</firstname>
-        <surname>Goasguen</surname>
-    </author>
-</authorgroup>
+<chapter id="Wrappers">
+  <title>Wrappers</title>
+  <para>
+    This is a test paragraph
+  </para>
+
+  <xi:include href="knife-cloudstack.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="saltcloud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="whirr.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="pallet.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+  <xi:include href="stormdeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+</chapter>
 

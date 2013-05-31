@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8' ?>
-<!DOCTYPE authorgroup PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY % BOOK_ENTITIES SYSTEM "ACS101.ent">
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "cloudstack.ent">
 %BOOK_ENTITIES;
 ]>
 
@@ -22,11 +22,14 @@
  under the License.
 -->
 
-
-<authorgroup>
-    <author>
-        <firstname>Sebastien</firstname>
-        <surname>Goasguen</surname>
-    </author>
-</authorgroup>
-
+<section id="knife-cloudstack">
+    <title>Knife &PRODUCT;</title>
+    <para>The Knife family of tools are drivers that automate the provisioning and configuration of machines in the Cloud. Knife-cloudstack is the CloudStack version of knife. Wirtten in ruby..</para>
+    <note>
+        <para>DevCloud is provided as a convenience by community members. It is not an official &PRODUCT; release artifact.</para>
+        <para>The &PRODUCT; source code however, contains tools to build your own DevCloud.</para>
+    </note>
+    <warning>
+        <para>Storm is </para>
+    </warning>
+</section>

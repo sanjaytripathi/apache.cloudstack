@@ -24,8 +24,8 @@
 
 
 <bookinfo id="book-ACS101-ACS101">
-    <title>ACS101</title>
-    <subtitle>Introduction to Apache CloudStack as a foundation for Cloud Computing environments.</subtitle>
+    <title>The Little &PRODUCT; Book</title>
+    <subtitle>Introduction to Apache CloudStack API, Clients and Tools.</subtitle>
     <productname>Apache CloudStack</productname>
     <productnumber>4.1.0</productnumber>
     <edition>0</edition>
