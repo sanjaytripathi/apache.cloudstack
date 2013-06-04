@@ -333,6 +333,8 @@ public class SimulatorManagerImpl extends ManagerBase implements SimulatorManage
                 return _mockNetworkMgr.setNetworkAcl((SetNetworkACLCommand) cmd);
             } else if (cmd instanceof SetPortForwardingRulesVpcCommand) {
                 return _mockNetworkMgr.setVpcPortForwards((SetPortForwardingRulesVpcCommand) cmd);
+            } else if (cmd instanceof SetStaticNatRulesCommand) {
+                return _mockNetworkMgr.setVPCStaticNatRules((SetStaticNatRulesCommand) cmd);
             } else if (cmd instanceof SetStaticRouteCommand) {
                 return _mockNetworkMgr.setStaticRoute((SetStaticRouteCommand) cmd);
             } else if (cmd instanceof Site2SiteVpnCfgCommand) {
