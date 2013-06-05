@@ -31,9 +31,10 @@
 
     <xi:include href="cloudstackapi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="cloudmonkey.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="boto.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jcloudscli.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="libcloud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="clostack.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="boto.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
 </chapter>
 

@@ -69,7 +69,29 @@ Cleaning up...
 u'toto'
 ]]>
     </programlisting>
-   
+
+    <para>
+        I recently added support for keypair management in libcloud. For instace, given a conn object obtained from the previous interactive session:
+    </para>
+    <programlisting>
+conn.ex_list_keypairs()
+conn.ex_create_keypair(name='foobar')
+conn.ex_list_keypairs()
+conn.ex_delete_keypair(name='foobar')
+    </programlisting>
+
+    <para>
+        Management of security groups was also added. Below we show how to list, create and delete security groups. As well as add an ingree rule to open port 22 to the world.
+        Both keypair and security groups are key for access to a &PRODUCT; Basic zone like Exoscale.
+    </para>
+    <programlisting>
+conn.ex_list_security_groups()
+conn.ex_create_security_group(name='libcloud')
+conn.ex_authorize_security_group_ingress(securitygroupname='llibcloud',protocol='TCP',startport=22,cidrlist='0.0.0.0/0')
+conn.ex_delete_security_group('llibcloud')
+    </programlisting>   
+
+
     <para>One of the interesting use cases of Libcloud is that you can use multiple Cloud Providers, such as AWS, Rackspace, OpenNebula, vCloud and so on. You can then create Driver instances to each of these clouds and create your own multi cloud application.</para>
 
  </section>

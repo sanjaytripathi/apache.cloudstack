@@ -1,0 +1,120 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "ACS101.ent">
+%BOOK_ENTITIES;
+]>
+
+<!-- Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied.  See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+
+<section id="clostack">
+    <title>Clostack, a Clojure client</title>
+    <para>There are many tools available to interface with the &PRODUCT; API. Apache Libcloud is one of those. In this section
+          we provide a basic.</para>
+
+    <para>To install Libcloud refer to the libcloud website. If you are familiar with Pypi simply do:</para>
+    <programlisting>pip install apache-libcloud</programlisting>
+
+    <para>You should see the following output:</para>
+
+    <programlisting>
+pip install apache-libcloud
+Downloading/unpacking apache-libcloud
+    </programlisting>
+    
+    <para>You can then open a Python interactive shell, create an instance of a &PRODUCT; driver and call the available methods via the libcloud API.</para>
+
+    <programlisting>
+ <![CDATA[
+$ lein repl
+Retrieving codox/codox/0.6.4/codox-0.6.4.pom from clojars
+Retrieving codox/codox.leiningen/0.6.4/codox.leiningen-0.6.4.pom from clojars
+Retrieving leinjacker/leinjacker/0.4.1/leinjacker-0.4.1.pom from clojars
+Retrieving org/clojure/core.contracts/0.0.1/core.contracts-0.0.1.pom from central
+Retrieving org/clojure/core.unify/0.5.3/core.unify-0.5.3.pom from central
+Retrieving org/clojure/core.contracts/0.0.1/core.contracts-0.0.1.jar from central
+Retrieving org/clojure/core.unify/0.5.3/core.unify-0.5.3.jar from central
+Retrieving codox/codox/0.6.4/codox-0.6.4.jar from clojars
+Retrieving codox/codox.leiningen/0.6.4/codox.leiningen-0.6.4.jar from clojars
+Retrieving leinjacker/leinjacker/0.4.1/leinjacker-0.4.1.jar from clojars
+nREPL server started on port 59373
+REPL-y 0.1.4
+Clojure 1.5.1
+    Exit: Control+D or (exit) or (quit)
+Commands: (user/help)
+    Docs: (doc function-name-here)
+          (find-doc "part-of-name-here")
+  Source: (source function-name-here)
+          (user/sourcery function-name-here)
+ Javadoc: (javadoc java-object-or-class-here)
+Examples from clojuredocs.org: [clojuredocs or cdoc]
+          (user/clojuredocs name-here)
+          (user/clojuredocs "ns-here" "name-here")
+user=> (use 'clostack.client)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+nil
+user=> (list
+list                                list*                               list-accounts                       list-async-jobs                     
+list-capabilities                   list-disk-offerings                 list-event-types                    list-events                         
+list-firewall-rules                 list-hypervisors                    list-instance-groups                list-ip-forwarding-rules            
+list-iso-permissions                list-isos                           list-lb-stickiness-policies         list-load-balancer-rule-instances   
+list-load-balancer-rules            list-network-ac-ls                  list-network-offerings              list-networks                       
+list-os-categories                  list-os-types                       list-port-forwarding-rules          list-private-gateways               
+list-project-accounts               list-project-invitations            list-projects                       list-public-ip-addresses            
+list-remote-access-vpns             list-resource-limits                list-security-groups                list-service-offerings              
+list-snapshot-policies              list-snapshots                      list-ssh-key-pairs                  list-static-routes                  
+list-tags                           list-template-permissions           list-templates                      list-virtual-machines               
+list-volumes                        list-vp-cs                          list-vpc-offerings                  list-vpn-connections                
+list-vpn-customer-gateways          list-vpn-gateways                   list-vpn-users                      list-zones                          
+list?                               
+user=> (list
+list                                list*                               list-accounts                       list-async-jobs                     
+list-capabilities                   list-disk-offerings                 list-event-types                    list-events                         
+list-firewall-rules                 list-hypervisors                    list-instance-groups                list-ip-forwarding-rules            
+list-iso-permissions                list-isos                           list-lb-stickiness-policies         list-load-balancer-rule-instances   
+list-load-balancer-rules            list-network-ac-ls                  list-network-offerings              list-networks                       
+list-os-categories                  list-os-types                       list-port-forwarding-rules          list-private-gateways               
+list-project-accounts               list-project-invitations            list-projects                       list-public-ip-addresses            
+list-remote-access-vpns             list-resource-limits                list-security-groups                list-service-offerings              
+list-snapshot-policies              list-snapshots                      list-ssh-key-pairs                  list-static-routes                  
+list-tags                           list-template-permissions           list-templates                      list-virtual-machines               
+list-volumes                        list-vp-cs                          list-vpc-offerings                  list-vpn-connections                
+list-vpn-customer-gateways          list-vpn-gateways                   list-vpn-users                      list-zones                          
+list?                               
+user=> (def cs (http-client))
+#'user/cs
+user=> cs
+#clostack.client.CloudstackHTTPClient{:api-key "mnH5EbKcKeJdJcsSnav7SKoqwNtZFGXOiITNCev5AKAd3ArKkMF5FlpurvguEIwQG_Fn-N0lcRt8AZW4kYV55Q", :api-secret nil, :endpoint "https://api.exoscale.ch/compute", :http-client #<AsyncHttpClient com.ning.http.client.AsyncHttpClient@5aa370c7>}
+user=> (list-templates cs :templatefilter "featured")
+NullPointerException   clojure.lang.Reflector.invokeNoArgInstanceMember (Reflector.java:296)
+
+user=> (def cs (http-client :api-secret "Hv97W5UKHG-268UN_UKIzPgw7B0zgnJKdReeUmtDHGfbWneOyJO621TdqdFR07Co38iby5PWL1ylC4oJlslicg"))
+#'user/cs
+user=> (list-templates cs :templatefilter "featured")
+]]>
+    </programlisting>
+
+    <para>Clojure seems to be getting a lot of attention these days, mostly for its functional programming aspect.
+          It offers a very clean syntax with the strength of java and the rapid prototyping characteristics of scripting languages.
+          Frameworks like Pallet are making use of clojure to build advanced cloud services. In the next chapter we will have a quick look at pallet-exoscale
+          which lets you create <emphasis>crates</emphasis> in the cloud, defining node dependencies and software packages that need to be configured.
+    </para>
+
+ </section>

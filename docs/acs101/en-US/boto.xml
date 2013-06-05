@@ -23,7 +23,7 @@
 -->
 
 <section id="boto">
-    <title>Examples</title>
+    <title>Pyton Boto</title>
     <para>There are many tools available to interface with a AWS compatible API. In this section we provide
     a few examples that users of &PRODUCT; can build upon.</para>
 

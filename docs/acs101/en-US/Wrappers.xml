@@ -33,7 +33,6 @@
   <xi:include href="saltcloud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="whirr.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
   <xi:include href="pallet.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-  <xi:include href="stormdeploy.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
 </chapter>
 
