@@ -59,6 +59,7 @@ export JCLOUDS_COMPUTE_IDENTITY=mnH5EbKcKeJdJrvguEIwQG_Fn-N0l
         You should now be able to use jclouds-cli, check that it is in your path and runs, you should see the following output: 
     </para>
     <programlisting>
+<![CDATA[
 sebmini:jclouds-cli-1.7.0-SNAPSHOT sebastiengoasguen$ jclouds-cli
    _       _                 _      
   (_)     | |               | |     
@@ -98,6 +99,7 @@ State         Version          Name                                    Repositor
 [uninstalled] [1.7.0-SNAPSHOT] jclouds-aws-sqs                         jclouds-1.7.0-SNAPSHOT Amazon Web Service - SQS
 [uninstalled] [1.7.0-SNAPSHOT] jclouds-aws-sts                         jclouds-1.7.0-SNAPSHOT Amazon Web Service - STS
 ...<snip>
+]]>
     </programlisting>
     <note>
         <para>I edited the output of jclouds-cli to gain some space, there a lot more providers available</para>
@@ -162,7 +164,7 @@ f2101a0c-eaf7-4760-a143-0a5c940fd864            windows      null         AVAILA
 
     <para>We see that the os family is not listed properly, this is probably due to some regex used by jclouds to guess the OS type. Unfortunately the name key is not given.</para>
 
-    <para>To start an instance we can check the syntax of </emphasis>jclouds node create</emphasis></para>
+    <para>To start an instance we can check the syntax of <emphasis>jclouds node create</emphasis></para>
     <programlisting>
 $ jclouds node create --help
 DESCRIPTION
