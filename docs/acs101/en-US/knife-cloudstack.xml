@@ -24,12 +24,208 @@
 
 <section id="knife-cloudstack">
     <title>Knife &PRODUCT;</title>
-    <para>The Knife family of tools are drivers that automate the provisioning and configuration of machines in the Cloud. Knife-cloudstack is the CloudStack version of knife. Wirtten in ruby..</para>
+
+    <section id="knife-getting-started">
+    <title>Install, Configure and Feel</title>
+    <para>The Knife family of tools are drivers that automate the provisioning and configuration of machines in the Cloud. Knife-cloudstack is a &PRODUCT; plugin for knife. Written in ruby it is used by the Chef community. To install Knife-CloudStack you can simply install the gem or get it from github:</para>
+    <para>
+        <programlisting>gem install knife-cloudstack</programlisting>
+        If successfull the <emphasis>knife</emphasis> command should now be in your path. Issue <emphasis>knife</emphasis> at the prompt and see the various options and sub-commands available.
+    </para>
+    <para>
+        If you want to use the version on github simply clone it:
+        <programlisting>git clone https://github.com/CloudStack-extras/knife-cloudstack.git</programlisting>
+    </para>
+    <para>
+        If you clone the git repo and do changes to the code, you will want to build and install a new gem. As an example, in the directory where you cloned the knife-cloudstack repo do:
+        <programlisting>
+$ gem build knife-cloudstack.gemspec 
+  Successfully built RubyGem
+  Name: knife-cloudstack
+  Version: 0.0.14
+  File: knife-cloudstack-0.0.14.gem
+$ gem install knife-cloudstack-0.0.14.gem 
+Successfully installed knife-cloudstack-0.0.14
+1 gem installed
+Installing ri documentation for knife-cloudstack-0.0.14...
+Installing RDoc documentation for knife-cloudstack-0.0.14...
+        </programlisting>
+    </para>
+    <para>
+        You will then need to define your &PRODUCT; endpoint and your credentials in a <emphasis>knife.rb</emphasis> file like so:
+    </para>
+    <para>
+        <programlisting>
+knife[:cloudstack_url] = "http://yourcloudstackserver.com:8080/client/api
+knife[:cloudstack_api_key]  = "Your CloudStack API Key"
+knife[:cloudstack_secret_key] = "Your CloudStack Secret Key"
+        </programlisting>
+    </para>
+    <para>
+        With the endpoint and credentials configured as well as knife-cloudstack installed, you should be able to issue your first command. Remember that this is simply sending a &PRODUCT; API call to your &PRODUCT; based Cloud provider. Later in the section we will see how to do more advanced things with knife-cloudstack. For example, to list the service offerings (i.e instance types) available on the iKoula Cloud, do:
+    </para>
+    <para>
+        <programlisting>
+$ knife cs service list
+Name           Memory  CPUs  CPU Speed  Created                 
+m1.extralarge  15GB    8     2000 Mhz   2013-05-27T16:00:11+0200
+m1.large       8GB     4     2000 Mhz   2013-05-27T15:59:30+0200
+m1.medium      4GB     2     2000 Mhz   2013-05-27T15:57:46+0200
+m1.small       2GB     1     2000 Mhz   2013-05-27T15:56:49+0200
+        </programlisting>
+    </para>
+    <para>
+        To list all the <emphasis>knife-cloudstack</emphasis> commands available just enter <emphasis>knife cs</emphasis> at the prompt. You will see:
+    </para>
+    <para>
+        <programlisting>
+$ knife cs
+FATAL: Cannot find sub command for: 'cs'
+Available cs subcommands: (for details, knife SUB-COMMAND --help)
+
+** CS COMMANDS **
+knife cs account list (options)
+knife cs cluster list (options)
+knife cs config list (options)
+knife cs disk list (options)
+knife cs domain list (options)
+knife cs firewallrule list (options)
+knife cs host list (options)
+knife cs hosts
+knife cs iso list (options)
+knife cs template create NAME (options)
+knife cs keypair list (options)
+knife cs network list (options)
+knife cs oscategory list (options)
+knife cs ostype list (options)
+knife cs pod list (options)
+knife cs project list (options)
+knife cs router list (options)
+knife cs securitygroup list (options)
+knife cs server create [SERVER_NAME] (options)
+knife cs server delete SERVER_NAME [SERVER_NAME ...] (options)
+knife cs server list (options)
+knife cs server reboot SERVER_NAME [SERVER_NAME ...] (options)
+knife cs server start SERVER_NAME [SERVER_NAME ...] (options)
+knife cs server stop SERVER_NAME [SERVER_NAME ...] (options)
+knife cs service list (options)
+knife cs stack create JSON_FILE (options)
+knife cs stack delete JSON_FILE (options)
+knife cs template extract NAME (options)
+knife cs template list (options)
+knife cs template register NAME (options)
+knife cs user list (options)
+knife cs volume list (options)
+knife cs zone list (options)
+        </programlisting>
+    </para>
     <note>
-        <para>DevCloud is provided as a convenience by community members. It is not an official &PRODUCT; release artifact.</para>
-        <para>The &PRODUCT; source code however, contains tools to build your own DevCloud.</para>
+        <para>
+             If you only have user privileges on the Cloud you are using, as opposed to Admin privileges, do note that some commands won't be available to you.
+             For instance on the Cloud I am using where I am a standard user I cannot access any of the infrastructure type command like:
+        </para>
+        <para>
+                 <programlisting>
+$ knife cs pod list
+Error 432: Your account does not have the right to execute this command or the command does not exist.
+                 </programlisting>
+        </para>
     </note>
-    <warning>
-        <para>Storm is </para>
-    </warning>
+    <para>
+        Similarly to CloudMonkey, you can pass a list of fields to output. To find the potential fields enter the <emphasis>--fieldlist</emphasis> option at the end of the command.
+        You can then pick the fields that you want to output by passing a comma separated list to the <emphasis>--fields</emphasis> option like so:
+    </para>
+    <para>
+        <programlisting>
+$ knife cs service list --fieldlist
+Name           Memory  CPUs  CPU Speed  Created                 
+m1.extralarge  15GB    8     2000 Mhz   2013-05-27T16:00:11+0200
+m1.large       8GB     4     2000 Mhz   2013-05-27T15:59:30+0200
+m1.medium      4GB     2     2000 Mhz   2013-05-27T15:57:46+0200
+m1.small       2GB     1     2000 Mhz   2013-05-27T15:56:49+0200
+
+Key          Type        Value                               
+cpunumber    Fixnum      8                                   
+cpuspeed     Fixnum      2000                                
+created      String      2013-05-27T16:00:11+0200            
+defaultuse   FalseClass  false                               
+displaytext  String      8 Cores CPU with 15.3GB RAM         
+domain       String      ROOT                                
+domainid     String      1                                   
+hosttags     String      ex10                                
+id           String      1412009f-0e89-4cfc-a681-1cda0631094b
+issystem     FalseClass  false                               
+limitcpuuse  TrueClass   true                                
+memory       Fixnum      15360                               
+name         String      m1.extralarge                       
+networkrate  Fixnum      100                                 
+offerha      FalseClass  false                               
+storagetype  String      local                               
+tags         String      ex10 
+
+$ knife cs service list --fields id,name,memory,cpunumber
+id                                    name           memory  cpunumber
+1412009f-0e89-4cfc-a681-1cda0631094b  m1.extralarge  15360   8        
+d2b2e7b9-4ffa-419e-9ef1-6d413f08deab  m1.large       7680    4        
+8dae8be9-5dae-4f81-89d1-b171f25ef3fd  m1.medium      3840    2        
+c6b89fea-1242-4f54-b15e-9d8ec8a0b7e8  m1.small       1740    1
+        </programlisting>
+    </para>
+    </section>
+
+    <section id="server-create">
+        <title>Starting an Instance</title>
+        <para>
+            In order to manage instances <emphasis>knife</emphasis> has several commands:
+            <itemizedlist>
+               <listitem><para><emphasis>knife cs server list</emphasis> to list all instances</para></listitem>
+               <listitem><para><emphasis>knife cs server start</emphasis> to restart a paused instance</para></listitem>
+               <listitem><para><emphasis>knife cs server stop</emphasis> to suspend a running instance</para></listitem>
+               <listitem><para><emphasis>knife cs server delete</emphasis> to destroy an instance</para></listitem>
+               <listitem><para><emphasis>knife cs server reboot</emphasis> to reboot a running instance</para></listitem>
+            </itemizedlist>
+            And of course to create an instance <emphasis>knife cs server create</emphasis>
+        </para>
+        <para>
+            Knife will automatically allocate a Public IP address and associate it with your running instance. If you additionally pass port forwarding rules and firewall rules it will set those up. You need to specify an instance type, from the list returned by <emphasis>knife cs service list</emphasis> as well as a template, from the list returned by <emphasis>knife cs template list</emphasis>. The <emphasis>--no-boostrap</emphasis> option will tell knife to not install chef on the deployed instance. Syntax for the port forwarding and firewall rules are explained on the <ulink url="https://github.com/CloudStack-extras/knife-cloudstack">knife cloudstack</ulink> website. Here is an example on the <ulink url="http://www.ikoula.com">iKoula cloud</ulink> in France:
+        </para>
+        <para>
+            <programlisting>
+$ knife cs server create --no-bootstrap --service m1.small --template "CentOS 6.4 - Minimal - 64bits" --port-rules 22 foobar
+
+Waiting for Server to be created.......
+Allocate ip address, create forwarding rules
+params: {"command"=>"associateIpAddress", "zoneId"=>"a41b82a0-78d8-4a8f-bb79-303a791bb8a7", "networkId"=>"df2288bb-26d7-4b2f-bf41-e0fae1c6d198"}.
+Allocated IP Address: 178.170.XX.XX
+...
+Name:       foobar       
+Public IP:  178.170.XX.XX
+
+$ knife cs server list
+Name    Public IP      Service   Template                       State    Instance  Hypervisor
+foobar  178.170.XX.XX  m1.small  CentOS 6.4 - Minimal - 64bits  Running  N/A       N/A    
+            </programlisting>
+        </para>
+
+
+    </section>
+    
+    <section id="bootstrapping-chef">
+        <title>Bootstrapping Chef</title>
+        <para>
+        </para>
+
+
+    </section>
+
+
+    <section id="stack-create">
+        <title>Creating a Stack</title>
+        <para>
+        </para>
+
+
+    </section>
+
+
 </section>
