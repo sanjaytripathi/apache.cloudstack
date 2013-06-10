@@ -191,7 +191,7 @@ c6b89fea-1242-4f54-b15e-9d8ec8a0b7e8  m1.small       1740    1
         </para>
         <para>
             <programlisting>
-$ knife cs server create --no-bootstrap --service m1.small --template "CentOS 6.4 - Minimal - 64bits" --port-rules 22 foobar
+$ knife cs server create --no-bootstrap --service m1.small --template "CentOS 6.4 - Minimal - 64bits" foobar
 
 Waiting for Server to be created.......
 Allocate ip address, create forwarding rules
@@ -213,6 +213,31 @@ foobar  178.170.XX.XX  m1.small  CentOS 6.4 - Minimal - 64bits  Running  N/A    
     <section id="bootstrapping-chef">
         <title>Bootstrapping Chef</title>
         <para>
+            Knife is taking it's full potential when used to bootstrap Chef and use it for configuration management of the instances. Below is an example that does so:
+        </para>
+        <para>
+            <programlisting>
+$ knife cs server create --service m1.small --template "CentOS 6.4 - Minimal - 64bits" --ipfwd-rules 22 --ssh-user sebgoa --ssh-password totoestcon foobar4
+
+Waiting for Server to be created.......
+Allocate ip address, create forwarding rules
+params: {"command"=>"associateIpAddress", "zoneId"=>"a41b82a0-78d8-4a8f-bb79-303a791bb8a7", "networkId"=>"df2288bb-26d7-4b2f-bf41-e0fae1c6d198"}.
+Allocated IP Address: 178.170.71.134
+....
+Name:       foobar4       
+Public IP:  178.170.71.134
+
+
+Waiting for sshd.....
+
+Name:         foobar4       
+Public IP:    178.170.71.134
+Environment:  _default      
+Run List:                   
+
+Bootstrapping Chef on 178.170.71.134
+ERROR: Errno::ENOENT: No such file or directory - /etc/chef/validation.pem
+            </programlisting>
         </para>
 
 
