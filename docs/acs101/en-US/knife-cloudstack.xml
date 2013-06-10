@@ -211,35 +211,114 @@ foobar  178.170.XX.XX  m1.small  CentOS 6.4 - Minimal - 64bits  Running  N/A    
     </section>
     
     <section id="bootstrapping-chef">
-        <title>Bootstrapping Chef</title>
+        <title>Bootstrapping Instances with Hosted-Chef</title>
         <para>
-            Knife is taking it's full potential when used to bootstrap Chef and use it for configuration management of the instances. Below is an example that does so:
+            Knife is taking it's full potential when used to bootstrap Chef and use it for configuration management of the instances. To get started with Chef, the easiest is to use <ulink url="http://www.opscode.com/hosted-chef/">Hosted Chef</ulink>. There is some great documentation on <ulink url="https://learnchef.opscode.com/quickstart/chef-repo/">how</ulink> to do it. The basics concept is that you will download or create cookbooks locally and publish them to your own hosted Chef server.
+        </para>
+    </section>
+    <section id="boostrapping-knife">
+        <title>Using Knife with Hosted-Chef</title>
+        <para>
+            With your <emphasis>hosted Chef</emphasis> account created and your local <emphasis>chef-repo</emphasis> setup, you can start instances on your Cloud and specify the <emphasis>cookbooks</emphasis> to use to configure those instances. The boostrapping process will fetch those cookbooks and configure the node. Below is an example that does so, it uses the <ulink url="http://www.exoscale.ch">exoscale</ulink> cloud which runs on CloudStack. This cloud is enabled as a Basic zone and uses ssh keypairs and security groups for access. 
         </para>
         <para>
             <programlisting>
-$ knife cs server create --service m1.small --template "CentOS 6.4 - Minimal - 64bits" --ipfwd-rules 22 --ssh-user sebgoa --ssh-password totoestcon foobar4
+$ knife cs server create --service Tiny --template "Linux CentOS 6.4 64-bit" --ssh-user root --identity ~/.ssh/id_rsa --run-list "recipe[apache2]" --ssh-keypair foobar --security-group www --no-public-ip foobar
 
-Waiting for Server to be created.......
-Allocate ip address, create forwarding rules
-params: {"command"=>"associateIpAddress", "zoneId"=>"a41b82a0-78d8-4a8f-bb79-303a791bb8a7", "networkId"=>"df2288bb-26d7-4b2f-bf41-e0fae1c6d198"}.
-Allocated IP Address: 178.170.71.134
-....
-Name:       foobar4       
-Public IP:  178.170.71.134
+Waiting for Server to be created....
+Name:       foobar   
+Public IP:  185.19.XX.XX
 
 
 Waiting for sshd.....
 
-Name:         foobar4       
-Public IP:    178.170.71.134
-Environment:  _default      
-Run List:                   
+Name:         foobar13       
+Public IP:    185.19.XX.XX  
+Environment:  _default       
+Run List:     recipe[apache2]
 
-Bootstrapping Chef on 178.170.71.134
-ERROR: Errno::ENOENT: No such file or directory - /etc/chef/validation.pem
+Bootstrapping Chef on 185.19.XX.XX  
+185.19.XX.XX  --2013-06-10 11:47:54--  http://opscode.com/chef/install.sh
+185.19.XX.XX  Resolving opscode.com... 
+185.19.XX.XX  184.ZZ.YY.YY
+185.19.XX.XX Connecting to opscode.com|184.ZZ.XX.XX|:80... 
+185.19.XX.XX connected.
+185.19.XX.XX HTTP request sent, awaiting response... 
+185.19.XX.XX 301 Moved Permanently
+185.19.XX.XX Location: http://www.opscode.com/chef/install.sh [following]
+185.19.XX.XX --2013-06-10 11:47:55--  http://www.opscode.com/chef/install.sh
+185.19.XX.XX Resolving www.opscode.com... 
+185.19.XX.XX 184.ZZ.YY.YY
+185.19.XX.XX Reusing existing connection to opscode.com:80.
+185.19.XX.XX HTTP request sent, awaiting response... 
+185.19.XX.XX 200 OK
+185.19.XX.XX Length: 6509 (6.4K) [application/x-sh]
+185.19.XX.XX Saving to: “STDOUT”
+185.19.XX.XX 
+ 0% [                                       ] 0           --.-K/s              
+100%[======================================>] 6,509       --.-K/s   in 0.1s    
+185.19.XX.XX 
+185.19.XX.XX 2013-06-10 11:47:55 (60.8 KB/s) - written to stdout [6509/6509]
+185.19.XX.XX 
+185.19.XX.XX Downloading Chef 11.4.4 for el...
+185.19.XX.XX Installing Chef 11.4.4
             </programlisting>
         </para>
+        <para>
+            Chef will then configure the machine based on the cookbook passed in the --run-list option, here I setup a simple webserver. Note the keypair that I used and the security group. I also specify <emphasis>--no-public-ip</emphasis> which disables the IP address allocation and association. This is specific to the setup of <emphasis>exoscale</emphasis> which automatically uses a public IP address for the instances.
+        </para>
+        <note>
+            <para>
+                The latest version of knife-cloudstack allows you to manage keypairs and securitygroups. For instance listing, creation and deletion of keypairs is possible, as well as listing of securitygroups:
+                <programlisting>
+$ knife cs securitygroup list
+Name     Description             Account         
+default  Default Security Group  runseb@gmail.com
+www      apache server           runseb@gmail.com
+$ knife cs keypair list
+Name      Fingerprint                                    
+exoscale  xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx:xx
+                </programlisting>
+            </para>
+        </note>
+        <para>
+            When using a &PRODUCT; based cloud in an Advanced zone setting, <emphasis>knife</emphasis> can automatically allocate and associate an IP address. To illustrate this slightly different example I use <ulink url="http://www.ikoula.com">iKoula</ulink> a french Cloud Provider which uses &PRODUCT;. I edit my <emphasis>knife.rb</emphasis> file to setup a different endpoint and the different API and secret keys. I remove the keypair, security group and public ip option and I do not specify an identity file as I will retrieve the ssh password with the <emphasis>--cloudstack-password</emphasis> option. The example is as follows:
+        </para>
+        <para>
+            <programlisting>
+$ knife cs server create --service m1.small --template "CentOS 6.4 - Minimal - 64bits" --ssh-user root --cloudstack-password --run-list "recipe[apache2]" foobar
 
+Waiting for Server to be created........
+Allocate ip address, create forwarding rules
+params: {"command"=>"associateIpAddress", "zoneId"=>"a41b82a0-78d8-4a8f-bb79-303a791bb8a7", "networkId"=>"df2288bb-26d7-4b2f-bf41-e0fae1c6d198"}.
+Allocated IP Address: 178.170.71.148
+...
+Name:       foobar       
+Password:   $%@#$%#$%#$     
+Public IP:  178.xx.yy.zz
+
+
+Waiting for sshd......
+
+Name:         foobar     
+Public IP:    178.xx.yy.zz 
+Environment:  _default       
+Run List:     recipe[apache2]
+
+Bootstrapping Chef on 178.xx.yy.zz
+178.xx.yy.zz --2013-06-10 13:24:29--  http://opscode.com/chef/install.sh
+178.xx.yy.zz Resolving opscode.com...
+            </programlisting>
+        </para>
+        <warning>
+            <para>
+                You will want to review the security implications of doing the boostrap as root and using the default password to do so.
+            </para>
+        </warning>
+
+        <para>
+            With the basics of Chef configuration and usage covered, as well as the basic examples of using <emphasis>knife cloudstack</emphasis> to provision and configure instances we can now move on to the interesting case of configuring a group of instances and handling basic dependencies between those machines. The typical use case is when machines need to be provisioned according to a schedule so that information about one instance can be passed to another one. With <emphasis>knife cloudstack</emphasis> this is possible by using <emphasis>stacks</emphasis>.
+        </para>
 
     </section>
 

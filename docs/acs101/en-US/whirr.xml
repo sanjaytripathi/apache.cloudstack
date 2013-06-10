@@ -24,12 +24,172 @@
 
 <section id="whirr">
     <title>Apache Whirr</title>
-    <para>Whirr is ta stream processing analysis framework provides a <emphasis>Cloud in a box</emphasis>.</para>
-    <note>
-        <para>DevCloud is provided as a convenience by community members. It is not an official &PRODUCT; release artifact.</para>
-        <para>The &PRODUCT; source code however, contains tools to build your own DevCloud.</para>
-    </note>
-    <warning>
-        <para>Storm is </para>
-    </warning>
+    <para><ulink url="http://whirr.apache.org">Apache Whirr</ulink> is a set of libraries to run cloud services, internally it uses <ulink url="http://jclouds.incubator.apache.org">jclouds</ulink> that we introduced earlier via the jclouds-cli interface to &PRODUCT;, it is java based and of interest to provision clusters of virtual machines on cloud providers. Historically it started as a set of scripts to deploy <ulink url="http://hadoop.apache.org">Hadoop</ulink> clusters on Amazon EC2. We introduce Whirr has a potential &PRODUCT; tool to provision Hadoop cluster on &PRODUCT; based clouds.</para>
+
+    <section id="whirr-install">
+    <title>Installing Apache Whirr</title>
+        <para>
+            To install Whirr you can follow the <ulink url="http://whirr.apache.org/docs/0.8.1/quick-start-guide.html">Quick Start Guide</ulink>, download a tarball or clone the git repository. In the spirit of this document we clone the repo:
+        </para>
+        <programlisting>
+git clone git://git.apache.org/whirr.git
+        </programlisting>
+        <para>
+            And build the source with maven that we now know and love...:
+        </para>
+        <programlisting>
+mvn install        
+        </programlisting>
+        <para>
+            The whirr binary will be available in the <emphasis>bin</emphasis> directory that we can add to our path
+        </para>	
+        <programlisting>
+export PATH=$PATH:/Users/sebgoa/Documents/whirr/bin
+        </programlisting>
+        <para>
+            If all went well you should now be able to get the usage of <emphasis>whirr</emphasis>:
+        </para>
+        <programlisting>
+$ whirr --help
+Unrecognized command '--help'
+
+Usage: whirr COMMAND [ARGS]
+where COMMAND may be one of:
+
+  launch-cluster  Launch a new cluster running a service.
+  start-services  Start the cluster services.
+   stop-services  Stop the cluster services.
+restart-services  Restart the cluster services.
+ destroy-cluster  Terminate and cleanup resources for a running cluster.
+destroy-instance  Terminate and cleanup resources for a single instance.
+    list-cluster  List the nodes in a cluster.
+  list-providers  Show a list of the supported providers
+      run-script  Run a script on a specific instance or a group of instances matching a role name
+         version  Print the version number and exit.
+            help  Show help about an action
+
+Available roles for instances:
+  cassandra
+  elasticsearch
+  ganglia-metad
+  ganglia-monitor
+  hadoop-datanode
+  hadoop-jobtracker
+  hadoop-namenode
+  hadoop-tasktracker
+  hama-groomserver
+  hama-master
+  hbase-avroserver
+  hbase-master
+  hbase-regionserver
+  hbase-restserver
+  hbase-thriftserver
+  kerberosclient
+  kerberosserver
+  mahout-client
+  mapreduce-historyserver
+  noop
+  pig-client
+  puppet-install
+  solr
+  yarn-nodemanager
+  yarn-resourcemanager
+  zookeeper
+        </programlisting>
+        <para>
+            From the look of the usage you clearly see that <emphasis>whirr</emphasis> is about more than just <emphasis>hadoop</emphasis> and that it can be used to configure <emphasis>elasticsearch</emphasis> clusters, <emphasis>cassandra</emphasis> databases as well as the entire <emphasis>hadoop</emphasis> ecosystem with <emphasis>mahout</emphasis>, <emphasis>pig</emphasis>, <emphasis>hbase</emphasis>, <emphasis>hama</emphasis>, <emphasis>mapreduce</emphasis> and <emphasis>yarn</emphasis>.
+        </para>
+    </section>
+
+    <section id="whirr-use">
+    <title>Using Apache Whirr</title>
+        <para>
+            To get started with Whirr you need to setup the credentials and endpoint of your &PRODUCT; based cloud that you will be using. Edit the <emphasis>~/.whirr/credentials</emphasis> file to include a PROVIDER, IDENTITY, CREDENTIAL and ENDPOINT. The PROVIDER needs to be set to <emphasis>cloudstack</emphasis>, the IDENTITY is your API key, the CREDENTIAL is your secret key and the ENDPPOINT is the endpoint url. For instance:
+        </para>
+        <para>
+        <programlisting>
+PROVIDER=cloudstack
+IDENTITY=mnH5EbKc4534592347523486724389673248AZW4kYV5gdsfgdfsgdsfg87sdfohrjktn5Q
+CREDENTIAL=Hv97W58iby5PWL1ylC4oJls46456435634564537sdfgdfhrteydfg87sdf89gysdfjhlicg
+ENDPOINT=https://api.exoscale.ch/compute
+        </programlisting>
+        </para>
+        <para>
+            With the credentials and endpoint defined you can create a <emphasis>properties</emphasis> file that describes the cluster you want to launch on your cloud. The file contains information such as the cluster name, the number of instances and their type, the distribution of hadoop you want to use, the service offering id and the template id of the instances. It also defines the ssh keys to be used for accessing the virtual machines. In the case of a cloud that uses security groups, you may also need to specify it. A tricky point is the handling of DNS name resolution. You might have to use the <emphasis>whirr.store-cluster-in-etc-hosts</emphasis> key to bypass any DNS issues. For a full description of the whirr property keys, see the <ulink url="http://whirr.apache.org/docs/0.8.1/configuration-guide.html">documentation</ulink>.
+        </para>
+        <para>
+        <programlisting>
+$ more whirr.properties 
+
+#
+# Setup an Apache Hadoop Cluster
+# 
+
+# Change the cluster name here
+whirr.cluster-name=hadoop
+
+whirr.store-cluster-in-etc-hosts=true
+
+whirr.use-cloudstack-security-group=true
+
+# Change the name of cluster admin user
+whirr.cluster-user=${sys:user.name}
+
+# Change the number of machines in the cluster here
+whirr.instance-templates=1 hadoop-namenode+hadoop-jobtracker,3 hadoop-datanode+hadoop-tasktracker
+
+# Uncomment out the following two lines to run CDH
+whirr.env.repo=cdh4
+whirr.hadoop.install-function=install_cdh_hadoop
+whirr.hadoop.configure-function=configure_cdh_hadoop
+
+whirr.hardware-id=b6cd1ff5-3a2f-4e9d-a4d1-8988c1191fe8
+
+whirr.private-key-file=/path/to/ssh/key/
+whirr.public-key-file=/path/to/ssh/public/key/
+
+whirr.provider=cloudstack
+whirr.endpoint=https://the/endpoint/url
+whirr.image-id=1d16c78d-268f-47d0-be0c-b80d31e765d2
+        </programlisting>
+        </para>
+        <para>
+            You are now ready to launch an hadoop cluster:
+        </para>
+        <para>
+        <programlisting>
+<![CDATA[
+$ whirr launch-cluster --config hadoop.properties 
+Running on provider cloudstack using identity mnH5EbKcKeJd456456345634563456345654634563456345
+Bootstrapping cluster
+Configuring template for bootstrap-hadoop-datanode_hadoop-tasktracker
+Configuring template for bootstrap-hadoop-namenode_hadoop-jobtracker
+Starting 3 node(s) with roles [hadoop-datanode, hadoop-tasktracker]
+Starting 1 node(s) with roles [hadoop-namenode, hadoop-jobtracker]
+>> running InitScript{INSTANCE_NAME=bootstrap-hadoop-datanode_hadoop-tasktracker} on node(b9457a87-5890-4b6f-9cf3-1ebd1581f725)
+>> running InitScript{INSTANCE_NAME=bootstrap-hadoop-datanode_hadoop-tasktracker} on node(9d5c46f8-003d-4368-aabf-9402af7f8321)
+>> running InitScript{INSTANCE_NAME=bootstrap-hadoop-datanode_hadoop-tasktracker} on node(6727950e-ea43-488d-8d5a-6f3ef3018b0f)
+>> running InitScript{INSTANCE_NAME=bootstrap-hadoop-namenode_hadoop-jobtracker} on node(6a643851-2034-4e82-b735-2de3f125c437)
+<< success executing InitScript{INSTANCE_NAME=bootstrap-hadoop-datanode_hadoop-tasktracker} on node(b9457a87-5890-4b6f-9cf3-1ebd1581f725): {output=This function does nothing. It just needs to exist so Statements.call("retry_helpers") doesn't call something which doesn't exist
+Get:1 http://security.ubuntu.com precise-security Release.gpg [198 B]
+Get:2 http://security.ubuntu.com precise-security Release [49.6 kB]
+Hit http://ch.archive.ubuntu.com precise Release.gpg
+Get:3 http://ch.archive.ubuntu.com precise-updates Release.gpg [198 B]
+Get:4 http://ch.archive.ubuntu.com precise-backports Release.gpg [198 B]
+Hit http://ch.archive.ubuntu.com precise Release
+..../snip/.....
+You can log into instances using the following ssh commands:
+[hadoop-datanode+hadoop-tasktracker]: ssh -i /Users/sebastiengoasguen/.ssh/id_rsa -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no sebastiengoasguen@185.xx.yy.zz
+[hadoop-datanode+hadoop-tasktracker]: ssh -i /Users/sebastiengoasguen/.ssh/id_rsa -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no sebastiengoasguen@185.zz.zz.rr
+[hadoop-datanode+hadoop-tasktracker]: ssh -i /Users/sebastiengoasguen/.ssh/id_rsa -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no sebastiengoasguen@185.tt.yy.uu
+[hadoop-namenode+hadoop-jobtracker]: ssh -i /Users/sebastiengoasguen/.ssh/id_rsa -o "UserKnownHostsFile /dev/null" -o StrictHostKeyChecking=no sebastiengoasguen@185.ii.oo.pp
+To destroy cluster, run 'whirr destroy-cluster' with the same options used to launch it.
+]]>
+        </programlisting>
+        </para>
+        <para>
+            After the boostrapping process finishes you should be able to login to your instances and use <emphasis>hadoop</emphasis> or if you are running a proxy on your machine, you will be able to access your hadoop cluster locally. Testing of Whirr for &PRODUCT; is still under <ulink url="https://issues.apache.org/jira/browse/WHIRR-725">investigation</ulink> and the subject of a Google Summer of Code 2013 project. More information will be added as we learn them.
+        </para>
+    </section>
+
 </section>

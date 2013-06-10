@@ -25,7 +25,6 @@
 
 <book>
     <xi:include href="Book_Info.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="Overview.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="Gettinggoing.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="Clientsandshells.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="Wrappers.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
