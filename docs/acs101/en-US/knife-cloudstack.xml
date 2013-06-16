@@ -314,6 +314,33 @@ Bootstrapping Chef on 178.xx.yy.zz
             <para>
                 You will want to review the security implications of doing the boostrap as root and using the default password to do so.
             </para>
+            <para>
+                In Advanced Zone, your cloud provider may also have decided to block all egress traffic to the public internet, which means that contacting the hosted Chef server would fail. To configure the egress rules properly, CloudMonkey can be used. List the networks to find the id of your guest network, then create an egress firewall rule. Review the CloudMonkey section to find the proper API calls and their arguments.
+                <programlisting>
+> list networks filter=id,name,netmask
+count = 1
+network:
++--------------------------------------+------+---------------+
+|                  id                  | name |    netmask    |
++--------------------------------------+------+---------------+
+| df2288bb-26d7-4b2f-bf41-e0fae1c6d198 | test | 255.255.255.0 |
++--------------------------------------+------+---------------+
+
+> create egressfirewallrule networkid=df2288bb-26d7-4b2f-bf41-e0fae1c6d198 startport=80 endport=80 protocol=TCP cidrlist=10.1.1.0/24
+id = b775f1cb-a0b3-4977-90b0-643b01198367
+jobid = 8a5b735c-6aab-45f8-b687-0a1150a66e0f
+
+> list egressfirewallrules
+count = 1
+firewallrule:
++-----------+-----------+---------+------+-------------+--------+----------+--------------------------------------+
+| networkid | startport | endport | tags |   cidrlist  | state  | protocol |                  id                  |
++-----------+-----------+---------+------+-------------+--------+----------+--------------------------------------+
+|    326    |     80    |    80   |  []  | 10.1.1.0/24 | Active |   tcp    | baf8d072-7814-4b75-bc8e-a47bfc306eb1 |
++-----------+-----------+---------+------+-------------+--------+----------+--------------------------------------+
+
+                </programlisting>
+            </para>
         </warning>
 
         <para>
