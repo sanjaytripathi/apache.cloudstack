@@ -153,6 +153,16 @@ whirr.endpoint=https://the/endpoint/url
 whirr.image-id=1d16c78d-268f-47d0-be0c-b80d31e765d2
         </programlisting>
         </para>
+        <warning>
+            <para>
+                The example shown above is specific to a production <ulink url="http://exoscale.ch">Cloud</ulink> setup as a basic zone. This cloud uses security groups for isolation between instances. The proper rules had to be setup by hand. Also note the use of <emphasis>whirr.store-cluster-in-etc-hosts</emphasis>. If set to true whirr will edit the <emphasis>/etc/hosts</emphasis> file of the nodes and enter the IP adresses. This is handy in the case where DNS resolution is problematic.
+            </para>
+        </warning>
+        <note>
+            <para>
+                To use the Cloudera Hadoop distribution (CDH) like in the example above, you will need to copy the <emphasis>services/cdh/src/main/resources/functions</emphasis> directory to the root of your Whirr source. In this directory you will find the bash scripts used to bootstrap the instances. It may be handy to edit those scripts.
+            </para>
+        </note>
         <para>
             You are now ready to launch an hadoop cluster:
         </para>
@@ -188,8 +198,107 @@ To destroy cluster, run 'whirr destroy-cluster' with the same options used to la
         </programlisting>
         </para>
         <para>
-            After the boostrapping process finishes you should be able to login to your instances and use <emphasis>hadoop</emphasis> or if you are running a proxy on your machine, you will be able to access your hadoop cluster locally. Testing of Whirr for &PRODUCT; is still under <ulink url="https://issues.apache.org/jira/browse/WHIRR-725">investigation</ulink> and the subject of a Google Summer of Code 2013 project. More information will be added as we learn them.
+            After the boostrapping process finishes, you should be able to login to your instances and use <emphasis>hadoop</emphasis> or if you are running a proxy on your machine, you will be able to access your hadoop cluster locally. Testing of Whirr for &PRODUCT; is still under <ulink url="https://issues.apache.org/jira/browse/WHIRR-725">investigation</ulink> and the subject of a Google Summer of Code 2013 project. We currently identified issues with the use of security groups. Moreover this was tested on a basic zone. Complete testing on an advanced zone is future work.
         </para>
+    </section>
+
+    <section id="using-map-reduce">
+    <title>Running Map-Reduce jobs on Hadoop</title>
+        <para>
+        Whirr gives you the ssh command to connect to the instances of your hadoop cluster, login to the namenode and browse the hadoop file system that was created:
+        </para>
+        <programlisting>
+$ hadoop fs -ls /
+Found 5 items
+drwxrwxrwx   - hdfs supergroup          0 2013-06-21 20:11 /hadoop
+drwxrwxrwx   - hdfs supergroup          0 2013-06-21 20:10 /hbase
+drwxrwxrwx   - hdfs supergroup          0 2013-06-21 20:10 /mnt
+drwxrwxrwx   - hdfs supergroup          0 2013-06-21 20:11 /tmp
+drwxrwxrwx   - hdfs supergroup          0 2013-06-21 20:11 /user
+        </programlisting>
+		<para>Create a directory to put your input data</para>
+        <programlisting>
+$ hadoop fs -mkdir input
+$ hadoop fs -ls /user/sebastiengoasguen
+Found 1 items
+drwxr-xr-x   - sebastiengoasguen supergroup          0 2013-06-21 20:15 /user/sebastiengoasguen/input
+        </programlisting>
+        <para>Create a test input file and put in the hadoop file system:</para>
+		<programlisting>
+$ cat foobar 
+this is a test to count the words
+$ hadoop fs -put ./foobar input
+$ hadoop fs -ls /user/sebastiengoasguen/input
+Found 1 items
+-rw-r--r--   3 sebastiengoasguen supergroup         34 2013-06-21 20:17 /user/sebastiengoasguen/input/foobar
+        </programlisting>
+        <para>Define the map-reduce environment. Note that this default Cloudera distribution installation uses MRv1. To use Yarn one would have to edit the hadoop.properties file.
+        </para>
+        <programlisting>
+$ export HADOOP_MAPRED_HOME=/usr/lib/hadoop-0.20-mapreduce
+        </programlisting>
+        <para>Start the map-reduce job:</para>
+        <programlisting>
+<![CDATA[
+			$ hadoop jar $HADOOP_MAPRED_HOME/hadoop-examples.jar wordcount input output
+			13/06/21 20:19:59 WARN mapred.JobClient: Use GenericOptionsParser for parsing the arguments. Applications should implement Tool for the same.
+			13/06/21 20:20:00 INFO input.FileInputFormat: Total input paths to process : 1
+			13/06/21 20:20:00 INFO mapred.JobClient: Running job: job_201306212011_0001
+			13/06/21 20:20:01 INFO mapred.JobClient:  map 0% reduce 0%
+			13/06/21 20:20:11 INFO mapred.JobClient:  map 100% reduce 0%
+			13/06/21 20:20:17 INFO mapred.JobClient:  map 100% reduce 33%
+			13/06/21 20:20:18 INFO mapred.JobClient:  map 100% reduce 100%
+			13/06/21 20:20:21 INFO mapred.JobClient: Job complete: job_201306212011_0001
+			13/06/21 20:20:22 INFO mapred.JobClient: Counters: 32
+			13/06/21 20:20:22 INFO mapred.JobClient:   File System Counters
+			13/06/21 20:20:22 INFO mapred.JobClient:     FILE: Number of bytes read=133
+			13/06/21 20:20:22 INFO mapred.JobClient:     FILE: Number of bytes written=766347
+			13/06/21 20:20:22 INFO mapred.JobClient:     FILE: Number of read operations=0
+			13/06/21 20:20:22 INFO mapred.JobClient:     FILE: Number of large read operations=0
+			13/06/21 20:20:22 INFO mapred.JobClient:     FILE: Number of write operations=0
+			13/06/21 20:20:22 INFO mapred.JobClient:     HDFS: Number of bytes read=157
+			13/06/21 20:20:22 INFO mapred.JobClient:     HDFS: Number of bytes written=50
+			13/06/21 20:20:22 INFO mapred.JobClient:     HDFS: Number of read operations=2
+			13/06/21 20:20:22 INFO mapred.JobClient:     HDFS: Number of large read operations=0
+			13/06/21 20:20:22 INFO mapred.JobClient:     HDFS: Number of write operations=3
+			13/06/21 20:20:22 INFO mapred.JobClient:   Job Counters 
+			13/06/21 20:20:22 INFO mapred.JobClient:     Launched map tasks=1
+			13/06/21 20:20:22 INFO mapred.JobClient:     Launched reduce tasks=3
+			13/06/21 20:20:22 INFO mapred.JobClient:     Data-local map tasks=1
+			13/06/21 20:20:22 INFO mapred.JobClient:     Total time spent by all maps in occupied slots (ms)=10956
+			13/06/21 20:20:22 INFO mapred.JobClient:     Total time spent by all reduces in occupied slots (ms)=15446
+			13/06/21 20:20:22 INFO mapred.JobClient:     Total time spent by all maps waiting after reserving slots (ms)=0
+			13/06/21 20:20:22 INFO mapred.JobClient:     Total time spent by all reduces waiting after reserving slots (ms)=0
+			13/06/21 20:20:22 INFO mapred.JobClient:   Map-Reduce Framework
+			13/06/21 20:20:22 INFO mapred.JobClient:     Map input records=1
+			13/06/21 20:20:22 INFO mapred.JobClient:     Map output records=8
+			13/06/21 20:20:22 INFO mapred.JobClient:     Map output bytes=66
+			13/06/21 20:20:22 INFO mapred.JobClient:     Input split bytes=123
+			13/06/21 20:20:22 INFO mapred.JobClient:     Combine input records=8
+			13/06/21 20:20:22 INFO mapred.JobClient:     Combine output records=8
+			13/06/21 20:20:22 INFO mapred.JobClient:     Reduce input groups=8
+			13/06/21 20:20:22 INFO mapred.JobClient:     Reduce shuffle bytes=109
+			13/06/21 20:20:22 INFO mapred.JobClient:     Reduce input records=8
+			13/06/21 20:20:22 INFO mapred.JobClient:     Reduce output records=8
+			13/06/21 20:20:22 INFO mapred.JobClient:     Spilled Records=16
+			13/06/21 20:20:22 INFO mapred.JobClient:     CPU time spent (ms)=1880
+			13/06/21 20:20:22 INFO mapred.JobClient:     Physical memory (bytes) snapshot=469413888
+			13/06/21 20:20:22 INFO mapred.JobClient:     Virtual memory (bytes) snapshot=5744541696
+			13/06/21 20:20:22 INFO mapred.JobClient:     Total committed heap usage (bytes)=207687680
+]]>
+        </programlisting>
+        <para> And you can finally check the output:</para>
+        <programlisting>
+$ hadoop fs -cat output/part-* | head
+this	1
+to		1
+the		1
+a		1
+count	1
+is		1
+test	1
+words	1
+        </programlisting>            
     </section>
 
 </section>

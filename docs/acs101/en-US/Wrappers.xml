@@ -26,7 +26,7 @@
 <chapter id="Wrappers">
   <title>Wrappers</title>
   <para>
-    This is a test paragraph
+    In this paragraph we introduce several &PRODUCT; <emphasis>wrappers</emphasis>. These tools are using client libraries presented in the previous chapter and add additional functionality that involve some high-level orchestration. For instance <emphasis>knife-cloudstack</emphasis> uses the power of <ulink url="http://opscode.com">Chef</ulink>, the configuration management system, to seamlessly bootstrap instances running in a &PRODUCT; cloud. Apache <ulink url="http://whirr.apache.org">Whirr</ulink> uses <ulink url="http://jclouds.incubator.apache.org">jclouds</ulink> to boostrap <ulink url="http://hadoop.apache.org">Hadoop</ulink> clusters in the cloud and pallet does the same thing but using the clojure language.
   </para>
 
   <xi:include href="knife-cloudstack.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />

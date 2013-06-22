@@ -22,14 +22,100 @@
  under the License.
 -->
 
-<section id="saltcloud">
-    <title>Saltcloud</title>
-    <para>Salt is an alternative to Chef and Puppet  ovides a <emphasis>Cloud in a box</emphasis>.</para>
-    <note>
-        <para>DevCloud is provided as a convenience by community members. It is not an official &PRODUCT; release artifact.</para>
-        <para>The &PRODUCT; source code however, contains tools to build your own DevCloud.</para>
-    </note>
-    <warning>
-        <para>Storm is </para>
-    </warning>
+<section id="salt">
+    <title>Salt</title>
+    <para><ulink url="http://saltstack.com">Salt</ulink> is a configuration management system written in Python. It can be seen as an alternative to Chef and Puppet. Its concept is similar with a master node holding states called <emphasis>salt states (SLS)</emphasis> and minions that get their configuration from the master. A nice difference with Chef and Puppet is that Salt is also a remote execution engine and can be used to execute commands on the minions by specifying a set of targets. In this chapter we introduce Salt and dive into <ulink url="http://saltcloud.org">SaltCloud</ulink>, an open source software to provision <emphasis>Salt</emphasis> masters and minions in the Cloud. <emphasis>SaltCloud</emphasis> can be looked at as an alternative to <emphasis>knife-cs</emphasis> but certainly with less functionality.
+	</para>
+
+    <section id="intro-to-salt">
+    <title>Quick Introduction to Salt</title>
+    <para>
+    </para>
+
+    </section>
+
+    <section id="salt-cloud">
+    <title>SaltCloud installation and usage.</title>
+	    <para>
+	        To install Saltcloud one simply clones the git repository. To develop Saltcloud, just fork it on github and clone your fork, then commit patches and submit pull request. SaltCloud depends on libcloud, therefore you will need libcloud installed as well. See the previous chapter to setup libcloud. With Saltcloud installed and in your path, you need to define a Cloud provider in <emphasis>~/.saltcloud/cloud</emphasis>. For example:
+	    </para>
+	    <programlisting>
+	<![CDATA[
+	providers:
+	  exoscale:
+	    apikey: <your api key> 
+	    secretkey: <your secret key>
+	    host: api.exoscale.ch
+	    path: /compute
+	    securitygroup: default
+	    user: root
+	    private_key: ~/.ssh/id_rsa
+	    provider: cloudstack
+	]]>
+	    </programlisting>
+	    <para>
+	        The apikey, secretkey, host, path and provider keys are mandatory. The securitygroup key will specify which security group to use when starting the instances in that cloud. The user will be the username used to connect to the instances via ssh and the private_key is the ssh key to use. Note that the optional parameter are specific to the Cloud that this was tested on. Cloud in advanced zones especially will need a different setup.
+	    </para>
+	    <warning><para>
+	        Saltcloud used libcloud. Support for advanced zones in libcloud is still experimental, therefore using SaltCloud in advanced zone will likely need some development of libcloud.</para>
+	    </warning>
+		<para>
+	        Once a provider is defined, we can start using saltcloud to list the zones, the service offerings and the templates available on that cloud provider. So far nothing more than what libcloud provides. For example:
+	    </para>
+	    <programlisting>
+	$salt-cloud –list-locations exoscale
+	$salt-cloud –list-images exoscale
+	$salt-cloud –list-sizes exoscale
+	    </programlisting>
+	    <para>
+	        To start creating instances and configuring them with Salt, we need to define node profiles in <emphasis>~/.saltcloud/config</emphasis>. To illustrate two different profiles we show a Salt Master and a Minion. The Master would need a specific template (image:uuid), a service offering or instance type (size:uuid). In a basic zone with keypair access and security groups, one would also need to specify which keypair to use, where to listen for ssh connections and of course you would need to define the provider (e.g exoscale in our case, defined above). Below if the node profile for a Salt Master deployed in the Cloud:
+	    </para>
+	    <programlisting>
+	<![CDATA[
+	ubuntu-exoscale-master:
+	    provider: exoscale
+	    image: 1d16c78d-268f-47d0-be0c-b80d31e765d2 
+	    size: b6cd1ff5-3a2f-4e9d-a4d1-8988c1191fe8 
+	    ssh_interface: public
+	    ssh_username: root
+	    keypair: exoscale
+	    make_master: True
+	    master:
+	       user: root
+	       interface: 0.0.0.0
+	]]>
+	    </programlisting>
+	    <para>
+	        The master key shows which user to use and what interface, the make_master key if set to true will boostrap this node as a Salt Master. To create it on our cloud provider simply enter:
+	    </para>
+	    <programlisting>
+	$salt-cloud –p ubuntu-exoscale-master mymaster
+	    </programlisting>
+	    <para>
+	        Where <emphasis>mymaster</emphasis> is going to be the instance name. To create a minion, add a minion node profile in the config file:
+	    </para>
+	    <programlisting>
+	<![CDATA[
+	ubuntu-exoscale-minion:
+	    provider: exoscale
+	    image: 1d16c78d-268f-47d0-be0c-b80d31e765d2
+	    size: b6cd1ff5-3a2f-4e9d-a4d1-8988c1191fe8
+	    ssh_interface: public
+	    ssh_username: root
+	    keypair: exoscale
+	]]>
+	    </programlisting>
+	    <para>
+	        you would then start it with:
+	    </para>
+	    <programlisting>
+	$salt-cloud –p ubuntu-exoscale-minion myminion
+	    </programlisting>
+	    <note>
+	        <para>Saltcloud is still in an early phase of development and has little concept of dependencies between nodes. Therefore in the example described above the minion would not know where the master is, this would need to be resolved by hand by passing the IP of the master in the config profile of the minion. However this may not be a problem if the master is already existent and reachable by the instances. 
+	        </para>
+	    </note>
+
+    </section>
+
 </section>
