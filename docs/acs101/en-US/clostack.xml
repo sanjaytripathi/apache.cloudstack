@@ -24,9 +24,16 @@
 
 <section id="clostack">
     <title>Clostack, a Clojure client</title>
-    <para>There are many tools available to interface with the &PRODUCT; API. Apache Libcloud is one of those. In this section
-          we provide a basic.</para>
+    <para>There are many tools available to interface with the &PRODUCT; API. </para>
 
+
+    <section id="clojure-intro">
+    <title>Clojure</title>
+        <para>A quick intro to clojure</para>
+    </section>
+
+    <section id="clostack-install">
+    <title>Installation and configuration</title>
     <para>To install Libcloud refer to the libcloud website. If you are familiar with Pypi simply do:</para>
     <programlisting>pip install apache-libcloud</programlisting>
 
@@ -36,8 +43,11 @@
 pip install apache-libcloud
 Downloading/unpacking apache-libcloud
     </programlisting>
-    
-    <para>You can then open a Python interactive shell, create an instance of a &PRODUCT; driver and call the available methods via the libcloud API.</para>
+    </section>   
+
+    <section id="clostask-usage">
+    <title>Using clostack</title>
+    <para>With lein install you can start a REPL within the clostack project</para>
 
     <programlisting>
  <![CDATA[
@@ -84,20 +94,6 @@ list-tags                           list-template-permissions           list-tem
 list-volumes                        list-vp-cs                          list-vpc-offerings                  list-vpn-connections                
 list-vpn-customer-gateways          list-vpn-gateways                   list-vpn-users                      list-zones                          
 list?                               
-user=> (list
-list                                list*                               list-accounts                       list-async-jobs                     
-list-capabilities                   list-disk-offerings                 list-event-types                    list-events                         
-list-firewall-rules                 list-hypervisors                    list-instance-groups                list-ip-forwarding-rules            
-list-iso-permissions                list-isos                           list-lb-stickiness-policies         list-load-balancer-rule-instances   
-list-load-balancer-rules            list-network-ac-ls                  list-network-offerings              list-networks                       
-list-os-categories                  list-os-types                       list-port-forwarding-rules          list-private-gateways               
-list-project-accounts               list-project-invitations            list-projects                       list-public-ip-addresses            
-list-remote-access-vpns             list-resource-limits                list-security-groups                list-service-offerings              
-list-snapshot-policies              list-snapshots                      list-ssh-key-pairs                  list-static-routes                  
-list-tags                           list-template-permissions           list-templates                      list-virtual-machines               
-list-volumes                        list-vp-cs                          list-vpc-offerings                  list-vpn-connections                
-list-vpn-customer-gateways          list-vpn-gateways                   list-vpn-users                      list-zones                          
-list?                               
 user=> (def cs (http-client))
 #'user/cs
 user=> cs
@@ -110,11 +106,15 @@ user=> (def cs (http-client :api-secret "Hv97W5UKHG-268UN_UKIzPgw7B0zgnJKdReeUmt
 user=> (list-templates cs :templatefilter "featured")
 ]]>
     </programlisting>
+    </section>
 
+    <section id="clostack-future">
+    <title>Trend</title>
     <para>Clojure seems to be getting a lot of attention these days, mostly for its functional programming aspect.
           It offers a very clean syntax with the strength of java and the rapid prototyping characteristics of scripting languages.
           Frameworks like Pallet are making use of clojure to build advanced cloud services. In the next chapter we will have a quick look at pallet-exoscale
           which lets you create <emphasis>crates</emphasis> in the cloud, defining node dependencies and software packages that need to be configured.
     </para>
+    </section>
 
  </section>

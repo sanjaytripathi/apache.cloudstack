@@ -26,41 +26,82 @@
     <title>Apache Libcloud</title>
     <para>There are many tools available to interface with the &PRODUCT; API. Apache Libcloud is one of those. In this section
           we provide a basic example of how to use Libcloud with &PRODUCT;. It assumes that you have access to a &PRODUCT; endpoint and that you have the API access key and secret key of a user.</para>
-    <para>To install Libcloud refer to the libcloud website. If you are familiar with Pypi simply do:</para>
+
+    <section id="libcloud-installation">
+    <title>Installation</title>
+    <para>To install Libcloud refer to the libcloud <ulink url="http://libcloud.apache.org">website</ulink>. If you are familiar with Pypi simply do:</para>
     <programlisting>pip install apache-libcloud</programlisting>
     <para>You should see the following output:</para>
     <programlisting>
 pip install apache-libcloud
 Downloading/unpacking apache-libcloud
-  Downloading apache-libcloud-0.12.4.tar.bz2 (376kB): 376kB downloaded
-  Running setup.py egg_info for package apache-libcloud
+Downloading apache-libcloud-0.12.4.tar.bz2 (376kB): 376kB downloaded
+Running setup.py egg_info for package apache-libcloud
     
 Installing collected packages: apache-libcloud
-  Running setup.py install for apache-libcloud
+Running setup.py install for apache-libcloud
     
 Successfully installed apache-libcloud
 Cleaning up...
     </programlisting>
-    
-    <para>You can then open a Python interactive shell, create an instance of a &PRODUCT; driver and call the available methods via the libcloud API.</para>
+    <para>
+        Developers will want to clone the repository, for example from the github mirror:
+    </para>
+    <programlisting>
+git clone https://github.com/apache/libcloud.git
+    </programlisting>
+    <para>
+         To install libcloud from the cloned repo, simply do the following from within the clone repository directory:
+    </para>
+    <programlisting>
+sudo python ./setup.py install
+    </programlisting>
+    <note>
+        <para>
+            The &PRODUCT; driver is located in <emphasis>/path/to/libcloud/source/libcloud/compute/drivers/cloudstack.py</emphasis>. file bugs on the libcloud JIRA and submit your patches as an attached file to the JIRA entry.
+        </para>
+    </note>
+    </section>    
+
+    <section id="libcloud-usage">
+    <title>Using Libcloud</title>
+    <para>With libcloud installed either via PyPi or via the source, you can now open a Python interactive shell, create an instance of a &PRODUCT; driver and call the available methods via the libcloud API.</para>
+    <para>First you need to import the libcloud modules and create a &PRODUCT; driver.</para>
 
     <programlisting>
- <![CDATA[
+<![CDATA[
 >>> from libcloud.compute.types import Provider
 >>> from libcloud.compute.providers import get_driver
 >>> Driver = get_driver(Provider.CLOUDSTACK)
+]]>
+    </programlisting>
+
+    <para>Then, using your keys and endpoint, create a connection object. Note that this is a localtest and thus not secured.  If you use a production public cloud, make sure to use SSL properly.</para>
+    <programlisting>   
+<![CDATA[
 >>> apikey='plgWJfZK4gyS3mOMTVmjUVg-X-jlWlnfaUJ9GAbBbf9EdM-kAYMmAiLqzzq1ElZLYq_u38zCm0bewzGUdP66mg'
 >>> secretkey='VDaACYb0LV9eNjTetIOElcVQkvJck_J_QljX_FcHRj87ZKiy0z0ty0ZsYBkoXkY9b7eq1EhwJaw7FF3akA3KBQ'
 >>> host='http://localhost:8080'
 >>> path='/client/api'
->>> conn=Driver(apikey,secretkey,secure='False',host='localhost:8080',path=path)
 >>> conn=Driver(key=apikey,secret=secretkey,secure=False,host='localhost',port='8080',path=path)
+]]>
+    </programlisting>
+
+    <para>With the connection image in hand, you now use the libcloud base api to list such things as the templates (i.e images), the service offerings (i.e sizes) and the zones (i.e locations)</para>
+    <programlisting>
+<![CDATA[
 >>> conn.list_images()
 [<NodeImage: id=13ccff62-132b-4caf-b456-e8ef20cbff0e, name=tiny Linux, driver=CloudStack  ...>]
 >>> conn.list_sizes()
 [<NodeSize: id=ef2537ad-c70f-11e1-821b-0800277e749c, name=tinyOffering, ram=100 disk=0 bandwidth=0 price=0 driver=CloudStack ...>, <NodeSize: id=c66c2557-12a7-4b32-94f4-48837da3fa84, name=Small Instance, ram=512 disk=0 bandwidth=0 price=0 driver=CloudStack ...>, <NodeSize: id=3d8b82e5-d8e7-48d5-a554-cf853111bc50, name=Medium Instance, ram=1024 disk=0 bandwidth=0 price=0 driver=CloudStack ...>]
 >>> images=conn.list_images()
 >>> offerings=conn.list_sizes()
+]]>
+    </programlisting>
+
+    <para>The create_node method will take an instance name, a template and an instance type as arguments. It will return an instance of a <emphasis>CloudStackNode</emphasis> that has additional extensions methods, such as ex_stop and ex_start.</para>
+    <programlisting>
+<![CDATA[
 >>> node=conn.create_node(name='toto',image=images[0],size=offerings[0])
 >>> help(node)
 >>> node.get_uuid()
@@ -69,7 +110,10 @@ Cleaning up...
 u'toto'
 ]]>
     </programlisting>
+    </section>
 
+    <section id="libcloud-basic-zone">
+    <title>Keypairs and Security Groups</title>
     <para>
         I recently added support for keypair management in libcloud. For instace, given a conn object obtained from the previous interactive session:
     </para>
@@ -90,8 +134,51 @@ conn.ex_create_security_group(name='libcloud')
 conn.ex_authorize_security_group_ingress(securitygroupname='llibcloud',protocol='TCP',startport=22,cidrlist='0.0.0.0/0')
 conn.ex_delete_security_group('llibcloud')
     </programlisting>   
+    </section>
+    
+    <section id="libcloud-multi">
+    <title>Multiple Clouds</title>
+    <para>One of the interesting use cases of Libcloud is that you can use multiple Cloud Providers, such as AWS, Rackspace, OpenNebula, vCloud and so on. You can then create Driver instances to each of these clouds and create your own multi cloud application. In the example below we instantiate to libcloud &PRODUCT; driver, one on <ulink url="http://exoscale.ch">Exoscale</ulink> and the other on one <ulink url="http://ikoula.com">Ikoula</ulink>.</para>
+    <programlisting>
+ <![CDATA[
+import libcloud.security as sec
 
+Driver = get_driver(Provider.CLOUDSTACK)
 
-    <para>One of the interesting use cases of Libcloud is that you can use multiple Cloud Providers, such as AWS, Rackspace, OpenNebula, vCloud and so on. You can then create Driver instances to each of these clouds and create your own multi cloud application.</para>
+apikey=os.getenv('EXOSCALE_API_KEY')
+secretkey=os.getenv('EXOSCALE_SECRET_KEY')
+endpoint=os.getenv('EXOSCALE_ENDPOINT')
+host=urlparse.urlparse(endpoint).netloc
+path=urlparse.urlparse(endpoint).path
+
+exoconn=Driver(key=apikey,secret=secretkey,secure=True,host=host,path=path)
+
+Driver = get_driver(Provider.CLOUDSTACK)
+
+apikey=os.getenv('IKOULA_API_KEY')
+secretkey=os.getenv('IKOULA_SECRET_KEY')
+endpoint=os.getenv('IKOULA_ENDPOINT')
+host=urlparse.urlparse(endpoint).netloc
+print host
+path=urlparse.urlparse(endpoint).path
+print path
+
+sec.VERIFY_SSL_CERT = False
+
+ikoulaconn=Driver(key=apikey,secret=secretkey,secure=True,host=host,path=path)
+
+drivers = [exoconn, ikoulaconn]
+
+		for driver in drivers:
+		    print driver.list_locations()
+]]>
+    </programlisting>
+    <note>
+        <para>
+            In the example above, I set my access and secret keys as well as the endpoints as environment variable. Also note the libcloud security module and the VERIFY_SSL_CERT. In the case of iKoula the SSL certificate used was not verifiable by the CERTS that libcloud checks. Especially if you use a self-signed SSL certificate for testing, you might have to disable this check as well.
+        </para>
+    </note>
+    <para>From this basic setup you can imagine how you would write an application that would manage instances in different Cloud Providers. Providing more resiliency to your overall infrastructure.</para>
+    </section>
 
  </section>

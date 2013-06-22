@@ -23,14 +23,22 @@
 -->
 
 <section id="cloudstackapi">
+	<title>The &PRODUCT; API</title>
+	<para>All functionalities of the &PRODUCT; data center orchestrator are exposed via an API server. Github currently has over fifteen clients for this API, in various languages. In this section we introduce this API and the signing mechanism. The follow on sections will introduce clients that already contain a signing method. The signing process is only highlighted for completeness.</para>
+
+    <section id="intro-api">
+    <title>Basics of the API</title>
+    <para>The API is <emphasis>http</emphasis> based, meaning that calls to the API server are made using the http protocol, the reponses are either in XML or JSON format. The request is made out of a set of key value pairs that correspond to input parameters of each call. The key/value pairs are passed within a url string. All calls used the http GET method. As such, the &PRODUCT; API is not a RESTfull API and more a Query API or RESTlike.</para>
+    <para>In isolated testing, one may wish to use the so-called integration port (e.g 8096 by default), this port makes the API directly accessible without signing requests. In production mode, the integration port should never be used and certainly not open to the public internet.</para>
+	</section>
+
+	<section id="signing-request">
     <title>How to sign an API call with Python</title>
-    <para>To illustrate the procedure used to sign API calls we present a step by step interactive session
-          using Python.</para>
+    <para>To illustrate the procedure used to sign API calls we present a step by step interactive session using Python.</para>
     
     <para>First import the required modules:</para>
     <programlisting>
-
- <![CDATA[
+<![CDATA[
 $python
 Python 2.7.3 (default, Nov 17 2012, 19:54:34) 
 [GCC 4.2.1 Compatible Apple Clang 4.1 ((tags/Apple/clang-421.11.66))] on darwin
@@ -43,7 +51,7 @@ Type "help", "copyright", "credits" or "license" for more information.
  ]]>
     </programlisting>
    
-    <para>Define the endpoint of the Cloud, the command that you want to execute and the keys of the user.</para>
+    <para>Define the endpoint of the Cloud, the command that you want to execute, the response type and the keys of the user.</para>
     <programlisting>
  <![CDATA[
 
@@ -55,7 +63,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> secretkey='VDaACYb0LV9eNjTetIOElcVQkvJck_J_QljX_FcHRj87ZKiy0z0ty0ZsYBkoXkY9b7eq1EhwJaw7FF3akA3KBQ'
   ]]>
     </programlisting>
-    <para>Build the request string:</para>
+    <para>Build the request string. The key/value pairs are join with the equal sign and all the pairs are joined with ampersand. </para>
     <programlisting>
  <![CDATA[
 >>> request_str='&'.join(['='.join([k,urllib.quote_plus(request[k])]) for k in request.keys()])
@@ -64,7 +72,7 @@ Type "help", "copyright", "credits" or "license" for more information.
   ]]>
     </programlisting>
 
-    <para>Compute the signature with hmac, do a 64 bit encoding and a url encoding: </para>
+    <para>Create the signature request similarly to the request string, but lower case everything, sort the keys and replace the plus sign with %20. Compute the hmac of the resulting string using the secret key and the sha1 algorithm, do a 64 bit encoding, strip the return carriage, and do a url encoding: </para>
     <programlisting>
   <![CDATA[
 >>> sig_str='&'.join(['='.join([k.lower(),urllib.quote_plus(request[k].lower().replace('+','%20'))])for k in sorted(request.iterkeys())]) 
@@ -93,9 +101,16 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> req
 'http://localhost:8080/client/api?apikey=plgWJfZK4gyS3mOMTVmjUVg-X-jlWlnfaUJ9GAbBbf9EdM-kAYMmAiLqzzq1ElZLYq_u38zCm0bewzGUdP66mg&command=listUsers&response=json&signature=TTpdDq%2F7j%2FJ58XCRHomKoQXEQds%3D'
 >>> res=urllib2.urlopen(req)
+]]>
+    </programlisting>
+    <para>In this particular example, the response is in json format. The first key is <emphasis>listusersresponse</emphasis> which contains <emphasis>count</emphasis> and a list of the users in <emphasis>user</emphasis></para>
+    <programlisting>
+<![CDATA[
 >>> res.read()
 '{ "listusersresponse" : { "count":3 ,"user" : [  {"id":"7ed6d5da-93b2-4545-a502-23d20b48ef2a","username":"admin","firstname":"admin","lastname":"cloud","created":"2012-07-05T12:18:27-0700","state":"enabled","account":"admin","accounttype":1,"domainid":"8a111e58-e155-4482-93ce-84efff3c7c77","domain":"ROOT","apikey":"plgWJfZK4gyS3mOMTVmjUVg-X-jlWlnfaUJ9GAbBbf9EdM-kAYMmAiLqzzq1ElZLYq_u38zCm0bewzGUdP66mg","secretkey":"VDaACYb0LV9eNjTetIOElcVQkvJck_J_QljX_FcHRj87ZKiy0z0ty0ZsYBkoXkY9b7eq1EhwJaw7FF3akA3KBQ","accountid":"7548ac03-af1d-4c1c-9064-2f3e2c0eda0d"}, {"id":"1fea6418-5576-4989-a21e-4790787bbee3","username":"runseb","firstname":"foobar","lastname":"goa","email":"joe@smith.com","created":"2013-04-10T16:52:06-0700","state":"enabled","account":"admin","accounttype":1,"domainid":"8a111e58-e155-4482-93ce-84efff3c7c77","domain":"ROOT","apikey":"Xhsb3MewjJQaXXMszRcLvQI9_NPy_UcbDj1QXikkVbDC9MDSPwWdtZ1bUY1H7JBEYTtDDLY3yuchCeW778GkBA","secretkey":"gIsgmi8C5YwxMHjX5o51pSe0kqs6JnKriw0jJBLceY5bgnfzKjL4aM6ctJX-i1ddQIHJLbLJDK9MRzsKk6xZ_w","accountid":"7548ac03-af1d-4c1c-9064-2f3e2c0eda0d"}, {"id":"52f65396-183c-4473-883f-a37e7bb93967","username":"toto","firstname":"john","lastname":"smith","email":"john@smith.com","created":"2013-04-23T04:27:22-0700","state":"enabled","account":"admin","accounttype":1,"domainid":"8a111e58-e155-4482-93ce-84efff3c7c77","domain":"ROOT","apikey":"THaA6fFWS_OmvU8od201omxFC8yKNL_Hc5ZCS77LFCJsRzSx48JyZucbUul6XYbEg-ZyXMl_wuEpECzK-wKnow","secretkey":"O5ywpqJorAsEBKR_5jEvrtGHfWL1Y_j1E4Z_iCr8OKCYcsPIOdVcfzjJQ8YqK0a5EzSpoRrjOFiLsG0hQrYnDA","accountid":"7548ac03-af1d-4c1c-9064-2f3e2c0eda0d"} ] } }'
   ]]>
     </programlisting>
-    
- </section>
+    <para>To epxlore further the &PRODUCT; API, use CloudMonkey and/or read the API <ulink url="http://cloudstack.apache.org/apidocumentation">documentation</ulink>, which contains the entire parameters list for each API call.</para>
+    </section>
+
+</section>

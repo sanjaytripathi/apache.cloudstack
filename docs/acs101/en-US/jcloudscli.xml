@@ -30,6 +30,8 @@
         <para>jclouds is under going incubation at the Apache Software Foundation, jclouds-cli is available on github. Changes may occur in the sofware from the time of this writing to the time of you reading it.</para>
     </warning>
 
+    <section id="installation">
+    <title>Installation and Configuration</title>
     <para>
         First install jclouds-cli via github and build it with maven:
     </para>
@@ -104,6 +106,10 @@ State         Version          Name                                    Repositor
     <note>
         <para>I edited the output of jclouds-cli to gain some space, there a lot more providers available</para>
     </note>
+    </section>
+
+    <section id="jclouds-cli-usage">
+    <title>Using jclouds CLI</title>
     <para>The &PRODUCT; API driver is not installed by default. Install it with:</para>
 
     <programlisting>
@@ -202,5 +208,6 @@ $ jclouds node info 4e733609-4c4a-4de1-9063-6fe5800ccb10
     </programlisting>
 
     <para>With this short intro, you are well on your way to using jclouds-cli. Check out the interactive shell, the blobstore and chef facility and commit back to this section.</para>
+    </section>
 
 </section>

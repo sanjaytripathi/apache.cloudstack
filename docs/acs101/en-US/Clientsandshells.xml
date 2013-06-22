@@ -26,15 +26,15 @@
 <chapter id="Clientsandshells">
   <title>Clients and Shells</title>
   <para>
-    This is a test paragraph
+    Clients and Shells are critical to the ease of use of any API, even more so Cloud APIs. In this chapter we present the basis of the &PRODUCT; API. We illustrate how to sign requests for the sake of completeness and because it is a very nice exercise for beginners. We then introduce CloudMonkey the &PRODUCT; CLI and shell which boasts a 100% coverage of the API. While jclouds is a java library, it can also be used as a cli or interactive shell, we present jclouds-cli to contrast it to CloudMonkey and introduce jclouds. Apache libcloud is a Python based API wrapper, once installed, a developer can use libcloud to talk to multiple cloud providers and cloud APIs, it serves a similar role as jclouds but in Python. Clostack is a clojure client. Clojure is receiving lots of attention recently for its clean functional programming style, clojure is the basis of Pallet which we will talk about in the next chapter. Clostack serves as a teaser for Clojure. Finally we cover Boto, the well-known Python Amazon Web Service interface, and show how it can be used with a &PRODUCT; cloud.
   </para>
 
     <xi:include href="cloudstackapi.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="cloudmonkey.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="jcloudscli.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="libcloud.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
-    <xi:include href="clostack.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
     <xi:include href="boto.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
+    <xi:include href="clostack.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 
 </chapter>
 
