@@ -23,7 +23,7 @@ import com.cloud.storage.dao.StoragePoolHostDao;
 import org.apache.cloudstack.engine.subsystem.api.storage.*;
 import org.apache.cloudstack.framework.async.AsyncCallbackDispatcher;
 import org.apache.cloudstack.framework.async.AsyncCompletionCallback;
-import org.apache.cloudstack.framework.async.AsyncRpcConext;
+import org.apache.cloudstack.framework.async.AsyncRpcContext;
 import org.apache.cloudstack.storage.command.CommandResult;
 import org.apache.cloudstack.storage.command.CreateObjectCommand;
 import org.apache.cloudstack.storage.datastore.DataObjectManager;
@@ -54,7 +54,7 @@ public class SamplePrimaryDataStoreDriverImpl implements PrimaryDataStoreDriver 
         return null;
     }
 
-    private class CreateVolumeContext<T> extends AsyncRpcConext<T> {
+    private class CreateVolumeContext<T> extends AsyncRpcContext<T> {
         private final DataObject volume;
         public CreateVolumeContext(AsyncCompletionCallback<T> callback, DataObject volume) {
             super(callback);
@@ -81,8 +81,8 @@ public class SamplePrimaryDataStoreDriverImpl implements PrimaryDataStoreDriver 
         /*
          * DeleteCommand cmd = new DeleteCommand(vo.getUri());
          * 
-         * EndPoint ep = selector.select(vo); AsyncRpcConext<CommandResult>
-         * context = new AsyncRpcConext<CommandResult>(callback);
+         * EndPoint ep = selector.select(vo); AsyncRpcContext<CommandResult>
+         * context = new AsyncRpcContext<CommandResult>(callback);
          * AsyncCallbackDispatcher<SamplePrimaryDataStoreDriverImpl, Answer>
          * caller = AsyncCallbackDispatcher.create(this);
          * caller.setCallback(caller.getTarget().deleteCallback(null, null))
@@ -91,7 +91,7 @@ public class SamplePrimaryDataStoreDriverImpl implements PrimaryDataStoreDriver 
     }
 
     public Void deleteCallback(AsyncCallbackDispatcher<SamplePrimaryDataStoreDriverImpl, Answer> callback,
-            AsyncRpcConext<CommandResult> context) {
+            AsyncRpcContext<CommandResult> context) {
         CommandResult result = new CommandResult();
         Answer answer = callback.getResult();
         if (!answer.getResult()) {
@@ -103,7 +103,7 @@ public class SamplePrimaryDataStoreDriverImpl implements PrimaryDataStoreDriver 
 
     /*
      * private class CreateVolumeFromBaseImageContext<T> extends
-     * AsyncRpcConext<T> { private final VolumeObject volume;
+     * AsyncRpcContext<T> { private final VolumeObject volume;
      * 
      * public CreateVolumeFromBaseImageContext(AsyncCompletionCallback<T>
      * callback, VolumeObject volume) { super(callback); this.volume = volume; }
