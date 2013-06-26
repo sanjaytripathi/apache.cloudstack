@@ -32,12 +32,14 @@ import org.apache.cloudstack.storage.image.ImageStoreDriver;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreHelper;
 import org.apache.cloudstack.storage.image.datastore.ImageStoreProviderManager;
 import org.apache.cloudstack.storage.image.store.lifecycle.ImageStoreLifeCycle;
+import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@Component
 public class SimulatorImageStoreProviderImpl implements ImageStoreProvider {
 
     private final String _providerName = DataStoreProvider.NFS_IMAGE;

@@ -51,6 +51,7 @@ public class SimulatorImageStoreLifeCycleImpl implements ImageStoreLifeCycle {
     @Inject
     ImageStoreProviderManager imageStoreMgr;
 
+
     @Override
     public DataStore initialize(Map<String, Object> dsInfos) {
         Long dcId = (Long) dsInfos.get("zoneId");
