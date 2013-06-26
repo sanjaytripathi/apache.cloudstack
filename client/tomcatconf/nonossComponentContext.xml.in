@@ -176,7 +176,22 @@
     
   It determines whether or not a adapter is activated or how it is loaded in order in its managing provider,
      
---> 
+-->
+
+  <!--Storage Providers-->
+  <bean id="storageProviders">
+    <property name="#{providers}">
+      <list>
+        <bean id="CloudStackPrimaryDataStoreProviderImpl" class="org.apache.cloudstack.storage.datastore.provider.CloudStackPrimaryDataStoreProviderImpl"/>
+        <!--<bean id="SolidfirePrimaryDataStoreProvider" class="org.apache.cloudstack.storage.datastore.provider.SolidfirePrimaryDataStoreProvider"/>-->
+        <!--<bean id="SamplePrimaryDataStoreProviderImpl" class="org.apache.cloudstack.storage.datastore.provider.SamplePrimaryDatastoreProviderImpl"/>-->
+        <bean id="CloudStackImageStoreProviderImpl" class="org.apache.cloudstack.storage.datastore.provider.CloudStackImageStoreProviderImpl"/>
+        <bean id="S3ImageStoreProviderImpl" class="org.apache.cloudstack.storage.datastore.provider.S3ImageStoreProviderImpl"/>
+        <bean id="SwiftImageStoreProviderImpl" class="org.apache.cloudstack.storage.datastore.provider.SwiftImageStoreProviderImpl"/>
+        <!--<bean id="SimulatorImageStoreProviderImpl" class="org.apache.cloudstack.storage.datastore.provider.SimulatorImageStoreProviderImpl"/>-->
+      </list>
+    </property>
+  </bean>
 
   <!-- Security adapters -->
   <bean id="userAuthenticators" class="com.cloud.utils.component.AdapterList">

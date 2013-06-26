@@ -50,7 +50,7 @@ public class DataStoreProviderManagerImpl extends ManagerBase implements DataSto
     @Inject
     PrimaryDataStoreProviderManager primaryDataStoreProviderMgr;
     @Inject
-    ImageStoreProviderManager imageDataStoreProviderMgr;
+    ImageStoreProviderManager imageStoreProviderMgr;
 
     @Override
     public DataStoreProvider getDataStoreProvider(String name) {
@@ -125,7 +125,7 @@ public class DataStoreProviderManagerImpl extends ManagerBase implements DataSto
                             (PrimaryDataStoreDriver) provider.getDataStoreDriver());
                     primaryDataStoreProviderMgr.registerHostListener(provider.getName(), provider.getHostListener());
                 } else if (types.contains(DataStoreProviderType.IMAGE)) {
-                    imageDataStoreProviderMgr.registerDriver(provider.getName(),
+                    imageStoreProviderMgr.registerDriver(provider.getName(),
                             (ImageStoreDriver) provider.getDataStoreDriver());
                 }
             } catch (Exception e) {
@@ -167,5 +167,29 @@ public class DataStoreProviderManagerImpl extends ManagerBase implements DataSto
         } else {
             throw new InvalidParameterValueException("Invalid parameter: " + type);
         }
+    }
+
+    public void setProviders(List<DataStoreProvider> providers) {
+        this.providers = providers;
+    }
+
+    public List<DataStoreProvider> getProviders() {
+        return providers;
+    }
+
+    public void setPrimaryDataStoreProviderMgr(PrimaryDataStoreProviderManager primaryDataStoreProviderMgr) {
+        this.primaryDataStoreProviderMgr = primaryDataStoreProviderMgr;
+    }
+
+    public PrimaryDataStoreProviderManager getPrimaryDataStoreProviderMgr() {
+        return primaryDataStoreProviderMgr;
+    }
+
+    public void setImageStoreProviderMgr(ImageStoreProviderManager imageDataStoreProviderMgr) {
+        this.imageStoreProviderMgr = imageDataStoreProviderMgr;
+    }
+
+    public ImageStoreProviderManager getImageStoreProviderMgr() {
+        return imageStoreProviderMgr;
     }
 }
