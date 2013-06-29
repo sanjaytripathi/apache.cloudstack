@@ -134,7 +134,6 @@ import com.cloud.org.Grouping.AllocationState;
 import com.cloud.resource.ResourceState;
 import com.cloud.server.ManagementServer;
 import com.cloud.server.StatsCollector;
-import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.ServiceOfferingVO;
 import com.cloud.storage.Storage.ImageFormat;
 import com.cloud.storage.Storage.StoragePoolType;
@@ -146,9 +145,6 @@ import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VMTemplatePoolDao;
 import com.cloud.storage.dao.VMTemplateZoneDao;
 import com.cloud.storage.dao.VolumeDao;
-import com.cloud.storage.dao.VolumeHostDao;
-import com.cloud.storage.DiskOfferingVO;
-import com.cloud.storage.download.DownloadMonitor;
 import com.cloud.storage.listener.StoragePoolMonitor;
 import com.cloud.storage.listener.VolumeStateListener;
 import com.cloud.template.TemplateManager;
@@ -578,7 +574,6 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         } else {
             s_logger.debug("Storage cleanup is not enabled, so the storage cleanup thread is not being scheduled.");
         }
-
         return true;
     }
 
@@ -587,7 +582,6 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         if (_storageCleanupEnabled) {
             _executor.shutdown();
         }
-
         return true;
     }
 
@@ -599,7 +593,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         if (dc == null || !dc.isLocalStorageEnabled()) {
             return null;
         }
-        DataStore store = null;
+        DataStore store;
         try {
             StoragePoolVO pool = _storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), pInfo.getHost(), pInfo.getHostPath(),
                     pInfo.getUuid());
@@ -631,7 +625,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
                 store = lifeCycle.initialize(params);
             } else {
-                store = (DataStore) dataStoreMgr.getDataStore(pool.getId(), DataStoreRole.Primary);
+                store = dataStoreMgr.getDataStore(pool.getId(), DataStoreRole.Primary);
             }
 
             HostScope scope = new HostScope(host.getId(), host.getDataCenterId());
@@ -641,7 +635,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             throw new ConnectionException(true, "Unable to setup the local storage pool for " + host, e);
         }
 
-        return (DataStore) dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Primary);
+        return dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Primary);
     }
 
     @Override
@@ -696,25 +690,11 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
             }
             if (hypervisorType != HypervisorType.KVM && hypervisorType != HypervisorType.VMware) {
                 throw new InvalidParameterValueException(
-                        "zone wide storage pool is not suported for hypervisor type " + hypervisor);
+                        "zone wide storage pool is not supported for hypervisor type " + hypervisor);
             }
         }
 
-        Map ds = cmd.getDetails();
-        Map<String, String> details = new HashMap<String, String>();
-        if (ds != null) {
-            Collection detailsCollection = ds.values();
-            Iterator it = detailsCollection.iterator();
-            while (it.hasNext()) {
-                HashMap d = (HashMap) it.next();
-                Iterator it2 = d.entrySet().iterator();
-                while (it2.hasNext()) {
-                    Map.Entry entry = (Map.Entry) it2.next();
-                    details.put((String) entry.getKey(), (String) entry.getValue());
-                }
-            }
-        }
-
+        Map<String, String> details = extractApiParamAsMap(cmd.getDetails());
         DataCenterVO zone = _dcDao.findById(cmd.getZoneId());
         if (zone == null) {
             throw new InvalidParameterValueException("unable to find zone by id " + zoneId);
@@ -736,10 +716,9 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         params.put("providerName", storeProvider.getName());
 
         DataStoreLifeCycle lifeCycle = storeProvider.getDataStoreLifeCycle();
-        DataStore store = null;
+        DataStore store;
         try {
             store = lifeCycle.initialize(params);
-
             if (scopeType == ScopeType.CLUSTER) {
                 ClusterScope clusterScope = new ClusterScope(clusterId, podId, zoneId);
                 lifeCycle.attachCluster(store, clusterScope);
@@ -753,6 +732,23 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         }
 
         return (PrimaryDataStoreInfo) dataStoreMgr.getDataStore(store.getId(), DataStoreRole.Primary);
+    }
+
+    private Map<String, String> extractApiParamAsMap(Map ds) {
+        Map<String, String> details = new HashMap<String, String>();
+        if (ds != null) {
+            Collection detailsCollection = ds.values();
+            Iterator it = detailsCollection.iterator();
+            while (it.hasNext()) {
+                HashMap d = (HashMap) it.next();
+                Iterator it2 = d.entrySet().iterator();
+                while (it2.hasNext()) {
+                    Map.Entry entry = (Map.Entry) it2.next();
+                    details.put((String) entry.getKey(), (String) entry.getValue());
+                }
+            }
+        }
+        return details;
     }
 
     @Override
@@ -1665,7 +1661,6 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         }
 
         Long dcId = cmd.getZoneId();
-        String url = cmd.getUrl();
         Map details = cmd.getDetails();
         ScopeType scopeType = ScopeType.ZONE;
         if (dcId == null) {
@@ -1714,7 +1709,7 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         params.put("role", DataStoreRole.Image);
 
         DataStoreLifeCycle lifeCycle = storeProvider.getDataStoreLifeCycle();
-        DataStore store = null;
+        DataStore store;
         try {
             store = lifeCycle.initialize(params);
         } catch (Exception e) {
