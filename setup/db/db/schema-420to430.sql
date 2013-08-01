@@ -21,3 +21,5 @@
 
 -- Disable foreign key checking
 SET foreign_key_checks = 0;
+
+ALTER TABLE `disk_offering` ADD `cache_mode` VARCHAR( 16 ) NOT NULL DEFAULT 'none' COMMENT 'The disk cache mode to use for disks created with this offering';

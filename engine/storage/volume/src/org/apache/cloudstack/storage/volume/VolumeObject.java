@@ -204,6 +204,15 @@ public class VolumeObject implements VolumeInfo {
         return null;
     }
 
+    @Override
+    public String getCacheMode() {
+        DiskOfferingVO diskOfferingVO = getDiskOfferingVO();
+        if (diskOfferingVO != null) {
+            return diskOfferingVO.getCacheMode();
+        }
+        return null;
+    }
+
     public void update() {
         volumeDao.update(volumeVO.getId(), volumeVO);
         volumeVO = volumeDao.findById(volumeVO.getId());

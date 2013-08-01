@@ -118,11 +118,32 @@ public class DiskOfferingVO implements DiskOffering {
     @Column(name="iops_write_rate")
     Long iopsWriteRate;
 
+    @Column(name="cache_mode")
+    private String cacheMode;
+
     @Column(name="display_offering")
     boolean displayOffering = true;
 
     public DiskOfferingVO() {
         this.uuid = UUID.randomUUID().toString();
+    }
+
+    public DiskOfferingVO(Long domainId, String name, String displayText, long diskSize, String tags, boolean isCustomized,
+            Boolean isCustomizedIops, Long minIops, Long maxIops, String cacheMode) {
+        this.domainId = domainId;
+        this.name = name;
+        this.displayText = displayText;
+        this.diskSize = diskSize;
+        this.tags = tags;
+        this.recreatable = false;
+        this.type = Type.Disk;
+        this.useLocalStorage = false;
+        this.customized = isCustomized;
+        this.uuid = UUID.randomUUID().toString();
+        this.customizedIops = isCustomizedIops;
+        this.minIops = minIops;
+        this.maxIops = maxIops;
+        this.cacheMode = cacheMode;
     }
 
     public DiskOfferingVO(Long domainId, String name, String displayText, long diskSize, String tags, boolean isCustomized,
@@ -214,6 +235,16 @@ public class DiskOfferingVO implements DiskOffering {
     @Override
     public void setMaxIops(Long maxIops) {
         this.maxIops = maxIops;
+    }
+
+    @Override
+    public String getCacheMode() {
+        return cacheMode;
+    }
+
+    @Override
+    public void setCacheMode(String cacheMode) {
+        this.cacheMode = cacheMode;
     }
 
 	@Override
