@@ -17,6 +17,7 @@
 package org.apache.cloudstack.storage.to;
 
 import com.cloud.hypervisor.Hypervisor;
+import com.cloud.offering.DiskOffering.DiskCacheMode;
 import org.apache.cloudstack.engine.subsystem.api.storage.VolumeInfo;
 
 import com.cloud.agent.api.to.DataObjectType;
@@ -42,7 +43,7 @@ public class VolumeObjectTO implements DataTO {
     private Long bytesWriteRate;
     private Long iopsReadRate;
     private Long iopsWriteRate;
-    private String cacheMode;
+    private DiskCacheMode cacheMode;
     private Hypervisor.HypervisorType hypervisorType;
 
     public VolumeObjectTO() {
@@ -222,11 +223,11 @@ public class VolumeObjectTO implements DataTO {
         return iopsWriteRate;
     }
 
-    public void setCacheMode(String cacheMode) {
+    public void setCacheMode(DiskCacheMode cacheMode) {
         this.cacheMode = cacheMode;
     }
 
-    public String getCacheMode() {
+    public DiskCacheMode getCacheMode() {
         return cacheMode;
     }
 

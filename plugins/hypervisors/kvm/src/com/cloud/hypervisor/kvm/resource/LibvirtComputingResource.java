@@ -3570,7 +3570,7 @@ ServerResource {
                 if ((volumeObjectTO.getIopsWriteRate() != null) && (volumeObjectTO.getIopsWriteRate() > 0))
                     disk.setIopsWriteRate(volumeObjectTO.getIopsWriteRate());
                 if (volumeObjectTO.getCacheMode() != null)
-                    disk.setCacheMode(DiskDef.diskCacheMode.valueOf(volumeObjectTO.getCacheMode()));
+                    disk.setCacheMode(DiskDef.diskCacheMode.valueOf(volumeObjectTO.getCacheMode().toString()));
             }
             vm.getDevices().addDevice(disk);
         }
