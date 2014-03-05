@@ -1904,17 +1904,17 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
     }
 
     int getReservedMemoryMb(VirtualMachineTO vmSpec) {
-         if (vmSpec.getDetails().get(Config.VmwareReserveMem.key()).equalsIgnoreCase("true")) {
-             return  (int) (vmSpec.getMinRam() / (1024 * 1024));
-         }
-         return 0;
+        if (vmSpec.getDetails().get("vmware.reserve.mem").equalsIgnoreCase("true")) {
+            return  (int) (vmSpec.getMinRam() / (1024 * 1024));
+        }
+        return 0;
     }
 
     int getReservedCpuMHZ(VirtualMachineTO vmSpec) {
-         if (vmSpec.getDetails().get(Config.VmwareReserveCpu.key()).equalsIgnoreCase("true")) {
-             return vmSpec.getMinSpeed();
-         }
-         return 0;
+        if (vmSpec.getDetails().get("vmware.reserve.cpu").equalsIgnoreCase("true")) {
+            return vmSpec.getMinSpeed();
+        }
+        return 0;
     }
 
     // return the finalized disk chain for startup, from top to bottom
