@@ -35,6 +35,18 @@ public class GpuResponse extends BaseResponse {
     @Param(description = "the list of enabled vGPUs", responseObject = VgpuResponse.class)
     private List<VgpuResponse> vgpu;
 
+    @SerializedName("capacityused")
+    @Param(description = "the capacity currently in use")
+    private String capacityUsed;
+
+    @SerializedName("capacitytotal")
+    @Param(description = "the total capacity available")
+    private Long capacityTotal;
+
+    @SerializedName("percentused")
+    @Param(description = "the percentage of capacity currently in use")
+    private String percentUsed;
+
     public void setGpuGroupName(String gpuGroupName) {
         this.gpuGroupName = gpuGroupName;
     }
@@ -43,4 +55,15 @@ public class GpuResponse extends BaseResponse {
         this.vgpu = vgpu;
     }
 
+    public void setCapacityUsed(String capacityUsed) {
+        this.capacityUsed = capacityUsed;
+    }
+
+    public void setCapacityTotal(Long capacityTotal) {
+        this.capacityTotal = capacityTotal;
+    }
+
+    public void setPercentUsed(String percentUsed) {
+        this.percentUsed = percentUsed;
+    }
 }

@@ -383,7 +383,9 @@
                     },
                     7: {
                         name: _l('label.vlan')
-                    }
+                    },
+                    19: {
+                        name: _l('GPU/vGPU')
                 };
 
                 $top.append($title);

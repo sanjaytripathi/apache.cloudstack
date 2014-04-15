@@ -16,6 +16,8 @@
 // under the License.
 package org.apache.cloudstack.api.response;
 
+import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
 
 import org.apache.cloudstack.api.ApiConstants;
@@ -63,6 +65,10 @@ public class CapacityResponse extends BaseResponse {
     @SerializedName("percentused")
     @Param(description = "the percentage of capacity currently in use")
     private String percentUsed;
+
+    @SerializedName(ApiConstants.GPUGROUP)
+    @Param(description = "GPU cards present in the host and enabled vgpuTypes with capacities", responseObject = GpuResponse.class, since = "4.4")
+    private List<GpuResponse> gpuCapacities;
 
     public Short getCapacityType() {
         return capacityType;
@@ -118,6 +124,10 @@ public class CapacityResponse extends BaseResponse {
 
     public void setClusterName(String clusterName) {
         this.clusterName = clusterName;
+    }
+
+    public void setGpuCapacities(List<GpuResponse> gpuCapacities) {
+        this.gpuCapacities = gpuCapacities;
     }
 
     public Long getCapacityUsed() {

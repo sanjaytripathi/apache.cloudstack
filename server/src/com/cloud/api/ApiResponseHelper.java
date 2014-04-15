@@ -66,6 +66,7 @@ import org.apache.cloudstack.api.response.ExtractResponse;
 import org.apache.cloudstack.api.response.FirewallResponse;
 import org.apache.cloudstack.api.response.FirewallRuleResponse;
 import org.apache.cloudstack.api.response.GlobalLoadBalancerResponse;
+import org.apache.cloudstack.api.response.GpuResponse;
 import org.apache.cloudstack.api.response.GuestOSResponse;
 import org.apache.cloudstack.api.response.GuestOsMappingResponse;
 import org.apache.cloudstack.api.response.GuestVlanRangeResponse;
@@ -150,6 +151,7 @@ import org.apache.cloudstack.usage.Usage;
 import org.apache.cloudstack.usage.UsageService;
 import org.apache.cloudstack.usage.UsageTypes;
 
+import com.cloud.agent.api.VgpuTypesInfo;
 import com.cloud.api.query.ViewResponseHelper;
 import com.cloud.api.query.vo.AccountJoinVO;
 import com.cloud.api.query.vo.AsyncJobJoinVO;
@@ -193,6 +195,7 @@ import com.cloud.domain.Domain;
 import com.cloud.event.Event;
 import com.cloud.exception.InvalidParameterValueException;
 import com.cloud.exception.PermissionDeniedException;
+import com.cloud.gpu.GPU;
 import com.cloud.host.Host;
 import com.cloud.host.HostVO;
 import com.cloud.hypervisor.HypervisorCapabilities;
@@ -1735,6 +1738,69 @@ public class ApiResponseHelper implements ResponseGenerator {
             capacityResponses.add(capacityResponse);
         }
 
+        List<VgpuTypesInfo> gpuCapacities;
+        if ((gpuCapacities = ApiDBUtils.getGpuCapacites(result.get(0).getDataCenterId(), result.get(0).getPodId(), result.get(0).getClusterId())) != null) {
+            HashMap<String, Long> vgpuVMs = ApiDBUtils.getVgpuVmsCount(result.get(0).getDataCenterId(), result.get(0).getPodId(), result.get(0).getClusterId());
+            ArrayList<GpuResponse> gpuResponses = new ArrayList<GpuResponse>();
+            float capacityUsed = 0, totalCapacityUsed = 0;
+            long capacityMax = 0, totalCapacityMax = 0;
+            String groupName = null, previousGroupName = gpuCapacities.get(0).getGroupName();
+            for (VgpuTypesInfo capacity : gpuCapacities) {
+                if(!previousGroupName.equals(capacity.getGroupName())) {
+                    GpuResponse gpuResponse = new GpuResponse();
+                    gpuResponse.setGpuGroupName(groupName);
+                    gpuResponse.setCapacityUsed(Float.toString(capacityUsed));
+                    gpuResponse.setCapacityTotal(capacityMax);
+                    gpuResponse.setPercentUsed(format.format(capacityUsed / capacityMax * 100f));
+                    gpuResponses.add(gpuResponse);
+                    totalCapacityUsed += capacityUsed;
+                    totalCapacityMax += capacityMax;
+                    // Initialize variables
+                    capacityUsed = 0;
+                    previousGroupName = capacity.getGroupName();
+                }
+                if (vgpuVMs.containsKey(capacity.getGroupName().concat(capacity.getModelName()))) {
+                    capacityUsed += (float)vgpuVMs.get(capacity.getGroupName().concat(capacity.getModelName())) / capacity.getMaxVpuPerGpu();
+                }
+                if (capacity.getModelName().equals(GPU.vGPUType.passthrough.toString())) {
+                    groupName = capacity.getGroupName();
+                    capacityMax = capacity.getMaxCapacity();
+                }
+            }
+            // Set response for last gpu group
+            GpuResponse gpuResponse = new GpuResponse();
+            gpuResponse.setGpuGroupName(groupName);
+            gpuResponse.setCapacityUsed(Float.toString(capacityUsed));
+            gpuResponse.setCapacityTotal(capacityMax);
+            gpuResponse.setPercentUsed(format.format(capacityUsed / capacityMax * 100f));
+            gpuResponses.add(gpuResponse);
+            totalCapacityUsed += capacityUsed;
+            totalCapacityMax += capacityMax;
+
+            DataCenter zone = ApiDBUtils.findZoneById(result.get(0).getDataCenterId());
+            CapacityResponse capacityResponse = new CapacityResponse();
+            if (zone != null) {
+                capacityResponse.setZoneId(zone.getUuid());
+                capacityResponse.setZoneName(zone.getName());
+            }
+            if (result.get(0).getPodId() != null) {
+                HostPodVO pod = ApiDBUtils.findPodById(result.get(0).getPodId());
+                capacityResponse.setZoneId(pod.getUuid());
+                capacityResponse.setZoneName(pod.getName());
+            }
+            if (result.get(0).getClusterId() != null) {
+                ClusterVO cluster = ApiDBUtils.findClusterById(result.get(0).getClusterId());
+                capacityResponse.setZoneId(cluster.getUuid());
+                capacityResponse.setZoneName(cluster.getName());
+            }
+            capacityResponse.setCapacityType(Capacity.CAPACITY_TYPE_GPU);
+            capacityResponse.setCapacityUsed((long)Math.ceil(totalCapacityUsed));
+            capacityResponse.setCapacityTotal(totalCapacityMax);
+            capacityResponse.setPercentUsed(format.format(totalCapacityUsed / totalCapacityMax * 100f));
+            capacityResponse.setObjectName("capacity");
+            capacityResponse.setGpuCapacities(gpuResponses);
+            capacityResponses.add(capacityResponse);
+        }
         return capacityResponses;
     }
 
