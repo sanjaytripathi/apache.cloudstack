@@ -153,12 +153,12 @@ public class Upgrade421to430 implements DbUpgrade {
     private void encryptLdapConfigParams(Connection conn) {
         PreparedStatement pstmt = null;
 
-        String[][] ldapParams = { {"ldap.user.object", "inetOrgPerson", "Sets the object type of users within LDAP"},
-                {"ldap.username.attribute", "uid", "Sets the username attribute used within LDAP"}, {"ldap.email.attribute", "mail", "Sets the email attribute used within LDAP"},
+        String[][] ldapParams = { {"ldap.user.object", "user", "Sets the object type of users within LDAP"},
+                {"ldap.username.attribute", "sAMAccountName", "Sets the username attribute used within LDAP"}, {"ldap.email.attribute", "mail", "Sets the email attribute used within LDAP"},
                 {"ldap.firstname.attribute", "givenname", "Sets the firstname attribute used within LDAP"},
                 {"ldap.lastname.attribute", "sn", "Sets the lastname attribute used within LDAP"},
-                {"ldap.group.object", "groupOfUniqueNames", "Sets the object type of groups within LDAP"},
-                {"ldap.group.user.uniquemember", "uniquemember", "Sets the attribute for uniquemembers within a group"}};
+                {"ldap.group.object", "group", "Sets the object type of groups within LDAP"},
+                {"ldap.group.user.uniquemember", "member", "Sets the attribute for uniquemembers within a group"}};
 
         String insertSql = "INSERT INTO `cloud`.`configuration`(category, instance, component, name, value, description) VALUES ('Secure', 'DEFAULT', 'management-server', ?, ?, "
                 + "?) ON DUPLICATE KEY UPDATE category='Secure';";
