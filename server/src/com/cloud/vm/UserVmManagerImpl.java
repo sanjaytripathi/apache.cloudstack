@@ -2867,6 +2867,20 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
                 }
 
                 profile.setDefaultNic(true);
+                if  (!_networkModel.areServicesSupportedInNetwork(network.getId(), Service.UserData)) {
+                    if (!(userData == null || userData.isEmpty())) {
+                        throw new InvalidParameterValueException("Unable to deploy VM as UserData is provided while deploying the VM, but there is no support for " +
+                                Service.UserData.getName() + " service in the default network " + network.getId());
+                    }
+                    if (!(sshPublicKey == null || sshPublicKey.isEmpty())) {
+                        throw new InvalidParameterValueException("Unable to deploy VM as SSH keypair is provided while deploying the VM, but there is no support for " +
+                                Service.UserData.getName() + " service in the default network " + network.getId());
+                    }
+                    if (template.getEnablePassword()) {
+                        throw new InvalidParameterValueException("Unable to deploy VM as template " + template.getId() + " is password enabled, but there is no support for " +
+                                Service.UserData.getName() + " service in the default network " + network.getId());
+                    }
+                }
             }
 
             networks.add(new Pair<NetworkVO, NicProfile>(network, profile));

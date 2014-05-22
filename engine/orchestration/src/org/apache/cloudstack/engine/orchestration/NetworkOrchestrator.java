@@ -1243,8 +1243,11 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
             }
             if (_networkModel.areServicesSupportedInNetwork(network.getId(), Service.UserData)
                     && _networkModel.isProviderSupportServiceInNetwork(network.getId(), Service.UserData, element.getProvider()) && element instanceof UserDataServiceProvider) {
+                s_logger.info("Service UserData is supported in the network id=" + network.getId());
                 UserDataServiceProvider sp = (UserDataServiceProvider)element;
                 sp.addPasswordAndUserdata(network, profile, vmProfile, dest, context);
+            } else {
+                s_logger.info("Service UserData is not supported in the network id=" + network.getId());
             }
         }
         return true;
