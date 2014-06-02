@@ -1570,6 +1570,8 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         if (host == null) {
             host = new HostVO(startup.getGuid());
             isNew = true;
+        } else {
+            hostTags = _hostTagsDao.gethostTags(host.getId());
         }
 
         String dataCenter = startup.getDataCenter();
@@ -1978,6 +1980,15 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
             }
         }
 
+        if (!ssCmd.getHostTags().isEmpty()) {
+            if (hostTags != null) {
+                hostTags.removeAll(ssCmd.getHostTags());
+                hostTags.addAll(ssCmd.getHostTags());
+            } else {
+                hostTags = ssCmd.getHostTags();
+            }
+        }
+
         HostPodVO pod = _podDao.findById(host.getPodId());
         DataCenterVO dc = _dcDao.findById(host.getDataCenterId());
         checkIPConflicts(pod, dc, ssCmd.getPrivateIpAddress(), ssCmd.getPublicIpAddress(), ssCmd.getPublicIpAddress(), ssCmd.getPublicNetmask());
@@ -1990,6 +2001,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
         host.setSpeed(ssCmd.getSpeed());
         host.setHypervisorType(hyType);
         host.setHypervisorVersion(ssCmd.getHypervisorVersion());
+        host.setHostTags(hostTags);
         host.setGpuGroups(ssCmd.getGpuGroupDetails());
         return host;
     }
