@@ -44,9 +44,13 @@ import com.cloud.dc.dao.ClusterDao;
 import com.cloud.dc.dao.DataCenterDao;
 import com.cloud.dc.dao.HostPodDao;
 import com.cloud.exception.InsufficientServerCapacityException;
+import com.cloud.gpu.GPU;
+import com.cloud.gpu.dao.HostGpuGroupsDao;
+import com.cloud.host.Host;
 import com.cloud.host.dao.HostDao;
 import com.cloud.hypervisor.Hypervisor.HypervisorType;
 import com.cloud.offering.ServiceOffering;
+import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.GuestOSCategoryDao;
@@ -103,6 +107,10 @@ public class FirstFitPlanner extends PlannerBase implements DeploymentClusterPla
     DataStoreManager dataStoreMgr;
     @Inject
     protected ClusterDetailsDao _clusterDetailsDao;
+    @Inject
+    protected ServiceOfferingDetailsDao _serviceOfferingDetailsDao;
+    @Inject
+    protected HostGpuGroupsDao _hostGpuGroupsDao;
 
     protected String _allocationAlgorithm = "random";
     protected String _globalDeploymentPlanner = "FirstFitPlanner";
@@ -132,7 +140,6 @@ public class FirstFitPlanner extends PlannerBase implements DeploymentClusterPla
                     clusterList.add(clusterIdSpecified);
                     removeClustersCrossingThreshold(clusterList, avoid, vmProfile, plan);
                 }
-                return clusterList;
             } else {
                 s_logger.debug("The specified cluster cannot be found, returning.");
                 avoid.addCluster(plan.getClusterId());
@@ -153,7 +160,6 @@ public class FirstFitPlanner extends PlannerBase implements DeploymentClusterPla
                         avoid.addPod(plan.getPodId());
                     }
                 }
-                return clusterList;
             } else {
                 s_logger.debug("The specified Pod cannot be found, returning.");
                 avoid.addPod(plan.getPodId());
@@ -165,13 +171,36 @@ public class FirstFitPlanner extends PlannerBase implements DeploymentClusterPla
             boolean applyAllocationAtPods = Boolean.parseBoolean(_configDao.getValue(Config.ApplyAllocationAlgorithmToPods.key()));
             if (applyAllocationAtPods) {
                 //start scan at all pods under this zone.
-                return scanPodsForDestination(vmProfile, plan, avoid);
+                clusterList = scanPodsForDestination(vmProfile, plan, avoid);
             } else {
                 //start scan at clusters under this zone.
-                return scanClustersForDestinationInZoneOrPod(plan.getDataCenterId(), true, vmProfile, plan, avoid);
+                clusterList = scanClustersForDestinationInZoneOrPod(plan.getDataCenterId(), true, vmProfile, plan, avoid);
             }
         }
 
+        ServiceOffering offering = vmProfile.getServiceOffering();
+        // In case of non-GPU VMs, protect GPU enabled Hosts and prefer VM deployment on non-GPU Hosts.
+        if ((_serviceOfferingDetailsDao.findDetail(offering.getId(), GPU.Keys.vgpuType.toString()) == null) && !(_hostGpuGroupsDao.listHostIds().isEmpty())) {
+            int requiredCpu = offering.getCpu() * offering.getSpeed();
+            long requiredRam = offering.getRamSize() * 1024L * 1024L;
+            reorderGpuEnabledClusters(clusterList, requiredCpu, requiredRam);
+        }
+        return clusterList;
+    }
+
+    private void reorderGpuEnabledClusters(List<Long> clusterList, int requiredCpu, long requiredRam) {
+            List<Long> preferredClusterList = new ArrayList<Long>();
+            List<Long> gpuHostList = _hostGpuGroupsDao.listHostIds();
+            for (Long clusterId : clusterList) {
+                List<Long> hostList = _capacityDao.listHostsWithEnoughCapacity(requiredCpu, requiredRam, clusterId, Host.Type.Routing.toString());
+                hostList.removeAll(gpuHostList);
+                if (!hostList.isEmpty()) {
+                    preferredClusterList.add(clusterId);
+                }
+            }
+            // Move all preferred clusters to the beginning of cluster list
+            clusterList.removeAll(preferredClusterList);
+            clusterList.addAll(0, preferredClusterList);
     }
 
     private List<Long> scanPodsForDestination(VirtualMachineProfile vmProfile, DeploymentPlan plan, ExcludeList avoid) {
