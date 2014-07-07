@@ -1083,7 +1083,7 @@ public class VmwareManagerImpl extends ManagerBase implements VmwareManager, Vmw
     public boolean removeVmwareDatacenter(RemoveVmwareDcCmd cmd) throws ResourceInUseException {
         Long zoneId = cmd.getZoneId();
         // Validate zone
-        validateZone(zoneId);
+        isValidZone(zoneId);
         // Zone validation to check if the zone already has resources.
         // Association of VMware DC to zone is not allowed if zone already has resources added.
         validateZoneWithResources(zoneId, "remove VMware datacenter to zone");
@@ -1165,6 +1165,17 @@ public class VmwareManagerImpl extends ManagerBase implements VmwareManager, Vmw
         }
     }
 
+    private void isValidZone(Long zoneId) throws InvalidParameterValueException {
+        // Check if zone with specified id exists
+        DataCenterVO zone = _dcDao.findById(zoneId);
+        if (zone == null) {
+            throw new InvalidParameterValueException("Can't find zone by the id specified.");
+        }
+        if (s_logger.isDebugEnabled()) {
+            s_logger.debug("Zone with id:[" + zoneId + "] exists.");
+        }
+    }
+
     private void validateZoneWithResources(Long zoneId, String errStr) throws ResourceInUseException {
         // Check if zone has resources? - For now look for clusters
         List<ClusterVO> clusters = _clusterDao.listByZoneId(zoneId);
@@ -1197,7 +1208,7 @@ public class VmwareManagerImpl extends ManagerBase implements VmwareManager, Vmw
         long vmwareDcId;
 
         // Validate if zone id parameter passed to API is valid
-        validateZone(zoneId);
+        isValidZone(zoneId);
 
         // Check if zone is associated with VMware DC
         vmwareDcZoneMap = _vmwareDcZoneMapDao.findByZoneId(zoneId);
