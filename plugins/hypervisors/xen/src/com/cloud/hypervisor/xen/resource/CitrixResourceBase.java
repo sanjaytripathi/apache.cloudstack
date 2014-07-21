@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.Random;
@@ -80,6 +81,7 @@ import com.xensource.xenapi.VGPU;
 import com.xensource.xenapi.VIF;
 import com.xensource.xenapi.VLAN;
 import com.xensource.xenapi.VM;
+import com.xensource.xenapi.VM.Record;
 import com.xensource.xenapi.VMGuestMetrics;
 import com.xensource.xenapi.XenAPIObject;
 
@@ -7170,11 +7172,18 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
         final HashMap<String, String> vmMetaDatum = new HashMap<String, String>();
         try {
             Map<VM, VM.Record>  vm_map = VM.getAllRecords(conn);  //USE THIS TO GET ALL VMS FROM  A CLUSTER
-            for (VM.Record record: vm_map.values()) {
+            for (Map.Entry<VM, VM.Record> entry: vm_map.entrySet()) {
+                Record record = entry.getValue();
                 if (record.isControlDomain || record.isASnapshot || record.isATemplate) {
                     continue; // Skip DOM0
                 }
+                VMGuestMetrics vgm = entry.getKey().getGuestMetrics(conn);
+                boolean pvDrvInstalled = false;
+                if (!isRefNull(vgm) && vgm.getPVDriversUpToDate(conn)) {
+                    pvDrvInstalled = true;
+                }
                 vmMetaDatum.put(record.nameLabel, StringUtils.mapToString(record.platform));
+                vmMetaDatum.put(record.nameLabel.concat("pvdrivers"), String.valueOf(pvDrvInstalled));
             }
         } catch (final Throwable e) {
             String msg = "Unable to get vms through host " + _host.uuid + " due to to " + e.toString();

@@ -2594,12 +2594,19 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
         if (vmMetadatum == null || vmMetadatum.isEmpty()) {
             return;
         }
+        String name = null, platform = null;
+        boolean pvDrvInstalled = false;
         for (Map.Entry<String, String> entry : vmMetadatum.entrySet()) {
-            String name = entry.getKey();
-            String platform = entry.getValue();
-            if (platform == null || platform.isEmpty()) {
-                continue;
+            if (entry.getKey().toString().endsWith("pvdrivers")) {
+                if (entry.getValue().equals(Boolean.TRUE.toString())) {
+                    pvDrvInstalled = true;
+                }
+            } else {
+                name = entry.getKey();
+                platform = entry.getValue();
             }
+        }
+        if (platform != null && !platform.isEmpty()) {
             VMInstanceVO vm = _vmDao.findVMByInstanceName(name);
             if (vm != null && vm.getType() == VirtualMachine.Type.User) {
                 boolean changed = false;
@@ -2614,7 +2621,7 @@ public class VirtualMachineManagerImpl extends ManagerBase implements VirtualMac
                     changed = true;
                 }
                 String pvdriver = "xenserver56";
-                if ( platform.contains("device_id")) {
+                if (pvDrvInstalled) {
                     pvdriver = "xenserver61";
                 }
                 if (!userVm.details.containsKey("hypervisortoolsversion") || !userVm.details.get("hypervisortoolsversion").equals(pvdriver)) {
