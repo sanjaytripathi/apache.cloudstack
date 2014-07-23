@@ -16090,10 +16090,6 @@
                                                 description: _l('VMware')
                                             });
                                             items.push({
-                                                id: 'Hyperv',
-                                                description: _l('Hyperv')
-                                            });
-                                            items.push({
                                                 id: 'Any',
                                                 description: _l('Any')
                                             });

@@ -1430,7 +1430,7 @@
                             }
 
                             //zone-wide-primary-storage is supported only for KVM and VMWare and Hyperv
-                            if (selectedHypervisorObj.hypervisortype == "KVM" || selectedHypervisorObj.hypervisortype == "VMware" || selectedHypervisorObj.hypervisortype == "Hyperv") {
+                            if (selectedHypervisorObj.hypervisortype == "KVM" || selectedHypervisorObj.hypervisortype == "VMware") {
                                 var scope = [];
                                 scope.push({
                                     id: 'zone',
