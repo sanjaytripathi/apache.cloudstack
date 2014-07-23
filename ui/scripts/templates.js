@@ -393,10 +393,6 @@
                                                     id: 'VHD',
                                                     description: 'VHD'
                                                 });
-                                                items.push({
-                                                    id: 'VHDX',
-                                                    description: 'VHDX'
-                                                });
                                             }
                                             args.response.success({
                                                 data: items

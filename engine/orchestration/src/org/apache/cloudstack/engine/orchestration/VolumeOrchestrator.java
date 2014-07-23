@@ -715,7 +715,7 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
         } else if (hyperType == HypervisorType.Ovm) {
             return ImageFormat.RAW;
         } else if (hyperType == HypervisorType.Hyperv) {
-            return ImageFormat.VHDX;
+            return ImageFormat.VHD;
         } else {
             return null;
         }
