@@ -148,9 +148,6 @@
                             path: 'regions.GSLB',
                             label: 'GSLB'
                         }, {
-                            path: 'network.vpc',
-                            label: 'label.regionlevelvpc'
-                        }, {
                             path: 'regions.portableIpRanges',
                             label: 'Portable IP',
                             preFilter: function(args) {

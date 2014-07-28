@@ -1243,14 +1243,6 @@ cloudStack.docs = {
         desc: 'The group name from which you want to import LDAP users',
         externalLink: ''
     },
-    helpVpcOfferingName: {
-        desc: 'Any desired name for the VPC offering',
-        externalLink: ''
-    },
-    helpVpcOfferingDescription: {
-        desc: 'A short description of the offering that can be displayed to users',
-        externalLink: ''
-    },
     // Add Nuage VSP
     helpVspHostname: {
         desc: 'The hostname/IP address of Nuage VSD',
