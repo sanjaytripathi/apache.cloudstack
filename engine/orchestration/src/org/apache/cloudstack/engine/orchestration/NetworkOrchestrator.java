@@ -925,7 +925,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     boolean isNetworkImplemented(NetworkVO network) {
         Network.State state = network.getState();
-        if (state == Network.State.Implemented) {
+        if (state == Network.State.Implemented || state == Network.State.Implementing) {
             return true;
         } else if (state == Network.State.Setup) {
             DataCenterVO zone = _dcDao.findById(network.getDataCenterId());
@@ -1277,19 +1277,7 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         });
 
         for (NicVO nic : nics) {
-            Pair<NetworkGuru, NetworkVO> implemented = null;
-            if (vmProfile.getVirtualMachine().getType() != Type.DomainRouter) {
-                implemented = implementNetwork(nic.getNetworkId(), dest, context);
-            } else {
-                // At the time of implementing network (using implementNetwork() method), if the VR needs to be deployed then
-                // it follows the same path of regular VM deployment. This leads to a nested call to implementNetwork() while
-                // preparing VR nics. This flow creates issues in dealing with network state transitions. The original call
-                // puts network in "Implementing" state and then the nested call again tries to put it into same state resulting
-                // in issues. In order to avoid it, implementNetwork() call for VR is replaced with below code.
-                NetworkVO network = _networksDao.findById(nic.getNetworkId());
-                NetworkGuru guru = AdapterBase.getAdapterByName(networkGurus, network.getGuruName());
-                implemented = new Pair<NetworkGuru, NetworkVO>(guru, network);
-            }
+            Pair<NetworkGuru, NetworkVO> implemented = implementNetwork(nic.getNetworkId(), dest, context);
             if (implemented == null || implemented.first() == null) {
                 s_logger.warn("Failed to implement network id=" + nic.getNetworkId() + " as a part of preparing nic id=" + nic.getId());
                 throw new CloudRuntimeException("Failed to implement network id=" + nic.getNetworkId() + " as a part preparing nic id=" + nic.getId());
@@ -2095,11 +2083,24 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
 
     @Override
     public boolean shutdownNetworkElementsAndResources(ReservationContext context, boolean cleanupElements, Network network) {
+
+        // get providers to shutdown
+        List<Provider> providersToShutdown = getNetworkProviders(network.getId());
+
         // 1) Cleanup all the rules for the network. If it fails, just log the failure and proceed with shutting down
         // the elements
         boolean cleanupResult = true;
+        boolean cleanupNeeded = false;
         try {
-            cleanupResult = shutdownNetworkResources(network.getId(), context.getAccount(), context.getCaller().getId());
+            for (Provider provider: providersToShutdown) {
+                if (provider.cleanupNeededOnShutdown()) {
+                    cleanupNeeded = true;
+                    break;
+                }
+            }
+            if (cleanupNeeded) {
+                cleanupResult = shutdownNetworkResources(network.getId(), context.getAccount(), context.getCaller().getId());
+            }
         } catch (Exception ex) {
             s_logger.warn("shutdownNetworkRules failed during the network " + network + " shutdown due to ", ex);
         } finally {
@@ -2110,8 +2111,6 @@ public class NetworkOrchestrator extends ManagerBase implements NetworkOrchestra
         }
 
         // 2) Shutdown all the network elements
-        // get providers to shutdown
-        List<Provider> providersToShutdown = getNetworkProviders(network.getId());
         boolean success = true;
         for (NetworkElement element : networkElements) {
             if (providersToShutdown.contains(element.getProvider())) {

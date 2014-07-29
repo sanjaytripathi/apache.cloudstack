@@ -454,6 +454,13 @@
                                         docID: 'helpRegisterTemplateRouting',
                                         isBoolean: true,
                                         isHidden: true
+                                    },
+                                    requireshvm: {
+                                        label: 'label.hvm',
+                                        docID: 'helpRegisterTemplateHvm',
+                                        isBoolean: true,
+                                        isHidden: false,
+                                        isChecked: true
                                     }
                                 }
                             },
@@ -475,6 +482,12 @@
                                 if (args.$form.find('.form-item[rel=isPublic]').css("display") != "none") {
                                     $.extend(data, {
                                         ispublic: (args.data.isPublic == "on")
+                                    });
+                                }
+
+                                if (args.$form.find('.form-item[rel=requireshvm]').css("display") != "none") {
+                                    $.extend(data, {
+                                        requireshvm: (args.data.requireshvm == "on")
                                     });
                                 }
 
