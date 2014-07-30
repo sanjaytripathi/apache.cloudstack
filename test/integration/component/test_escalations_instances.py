@@ -1658,7 +1658,8 @@ class TestListInstances(cloudstackTestCase):
                                            isdefault="true",
                                            zoneid=self.zone.id,
                                            account=self.account.name,
-                                           domainid=self.domain.id
+                                           domainid=self.domain.id,
+                                           type="Isolated"
                                            )
         status = validateList(list_network_before)
         self.assertEquals(
@@ -1699,13 +1700,13 @@ class TestListInstances(cloudstackTestCase):
                              network2,
                              "Network creation failed"
                              )
-        self.cleanup.append(network2)
         # Listing all the networks again
         list_network_after = Network.list(
                                           self.userapiclient,
                                           zoneid=self.zone.id,
                                           account=self.account.name,
-                                          domainid=self.domain.id
+                                          domainid=self.domain.id,
+                                          type="Isolated"
                                           )
         status = validateList(list_network_after)
         self.assertEquals(
@@ -2631,6 +2632,9 @@ class TestInstances(cloudstackTestCase):
                           len(list_volumes_page1),
                           "VM's volume count is not matching in page 1"
                           )
+        # stopping VM before detaching volumes
+        vm_created.stop(self.userapiclient)
+
         # Detaching all the volumes attached from VM
         for i in range(0, len(list_volumes_page1)):
             vm_created.detach_volume(
@@ -3231,7 +3235,8 @@ class TestInstances(cloudstackTestCase):
         # Listing all the networks available
         networks_list_before = Network.list(
                                             self.userapiclient,
-                                            listall=self.services["listall"]
+                                            listall=self.services["listall"],
+                                            type="Isolated"
                                             )
         networks_list_size = 0
         if networks_list_before is not None:
@@ -3272,7 +3277,8 @@ class TestInstances(cloudstackTestCase):
         # Listing the networks again
         networks_list_after = Network.list(
                                            self.userapiclient,
-                                           listall=self.services["listall"]
+                                           listall=self.services["listall"],
+                                           type="Isolated"
                                            )
         status = validateList(network_offerings_list)
         self.assertEquals(
