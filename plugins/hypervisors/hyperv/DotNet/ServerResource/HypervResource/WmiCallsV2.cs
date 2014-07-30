@@ -1,4 +1,4 @@
-﻿// Licensed to the Apache Software Foundation (ASF) under one
+// Licensed to the Apache Software Foundation (ASF) under one
 // or more contributor license agreements.  See the NOTICE file
 // distributed with this work for additional information
 // regarding copyright ownership.  The ASF licenses this file
@@ -447,10 +447,10 @@ namespace HypervResource
                             SetPortVlan(vlan, portSettings);
                         }
 
-                        if (networkRateMbps > 0)
+                        /*if (networkRateMbps > 0)
                         {
                             SetBandWidthLimit((ulong)networkRateMbps, portSettings);
-                        }
+                        }*/
 
                         logger.DebugFormat("Created adapter {0} on port {1}, {2}", 
                             newAdapter.Path, portSettings.Path, (vlan == null ? "No VLAN" : "VLAN " + vlan));
