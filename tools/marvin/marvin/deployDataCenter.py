@@ -1118,7 +1118,7 @@ if __name__ == "__main__":
                                    cfg,
                                    tc_run_logger,
                                    log_folder_path=log_folder_path)
-        if deploy.deploy() == FAILED
+        if deploy.deploy() == FAILED:
             print "\n===Deploy Failed==="
             tc_run_logger.debug("\n===Deploy Failed===");
             exit(1)
@@ -1141,5 +1141,5 @@ if __name__ == "__main__":
                 print "\n===Removing DataCenter Successful==="
                 tc_run_logger.debug("\n===Removing DataCenter Successful===")
 
-     # All OK exit with 0 exitcode
-     exit(0)
+    # All OK exit with 0 exitcode
+    exit(0)
