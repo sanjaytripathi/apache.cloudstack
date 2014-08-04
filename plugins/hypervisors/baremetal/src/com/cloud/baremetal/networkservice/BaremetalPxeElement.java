@@ -19,6 +19,7 @@
 package com.cloud.baremetal.networkservice;
 
 import com.cloud.baremetal.database.BaremetalPxeVO;
+import com.cloud.dc.DataCenter;
 import com.cloud.dc.Pod;
 import com.cloud.deploy.DeployDestination;
 import com.cloud.exception.ConcurrentOperationException;
@@ -99,6 +100,10 @@ public class BaremetalPxeElement extends AdapterBase implements NetworkElement {
     @Override
     public boolean implement(Network network, NetworkOffering offering, DeployDestination dest, ReservationContext context) throws ConcurrentOperationException,
         ResourceUnavailableException, InsufficientCapacityException {
+        if (dest.getDataCenter().getNetworkType() == DataCenter.NetworkType.Advanced){
+            return true;
+        }
+
         if (offering.isSystemOnly() || !canHandle(dest, offering.getTrafficType(), network.getGuestType())) {
             s_logger.debug("BaremetalPxeElement can not handle network offering: " + offering.getName());
             return false;
@@ -123,7 +128,7 @@ public class BaremetalPxeElement extends AdapterBase implements NetworkElement {
             _nicDao.update(nicVo.getId(), nicVo);
 
             /*This vm is just being created */
-            if (!_pxeMgr.prepare(vm, nic, dest, context)) {
+            if (!_pxeMgr.prepare(vm, nic, network, dest, context)) {
                 throw new CloudRuntimeException("Cannot prepare pxe server");
             }
         }
