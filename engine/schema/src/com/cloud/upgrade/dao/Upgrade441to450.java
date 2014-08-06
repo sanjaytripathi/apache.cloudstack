@@ -68,6 +68,28 @@ public class Upgrade441to450 implements DbUpgrade {
         updateSystemVmTemplates(conn);
         dropInvalidKeyFromStoragePoolTable(conn);
         dropDuplicatedForeignKeyFromAsyncJobTable(conn);
+        upgradeVMwareLocalStorage(conn);
+    }
+
+    private void upgradeVMwareLocalStorage(Connection conn) {
+        PreparedStatement updatePstmt = null;
+
+        try {
+            updatePstmt = conn.prepareStatement("update storage_pool set pool_type='VMFS',host_address=@newaddress where " +
+                    "(@newaddress:=concat('VMFS datastore: ',path)) is not null and scope = 'HOST' and pool_type = 'LVM' " +
+                    "and id in (select * from (select storage_pool.id from storage_pool,cluster where storage_pool.cluster_id = cluster.id and cluster.hypervisor_type='VMware') as t);");
+            updatePstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new CloudRuntimeException("Unable to upgrade vmware local storage pool type", e);
+        } finally {
+            try {
+                if (updatePstmt != null) {
+                    updatePstmt.close();
+                }
+            } catch (SQLException e) {
+            }
+        }
+        s_logger.debug("Done, upgrade vmware local storage pool type to VMFS and host_address to VMFS format");
     }
 
 
