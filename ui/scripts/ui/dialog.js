@@ -563,7 +563,7 @@
                     }).appendTo($value);
 
                     if (field.defaultValue) {
-                        $input.val(strOrFunc(field.defaultValue));
+                        $input.val(strOrFunc(field.defaultValue, args.context));
                     }
                     if (field.id) {
                         $input.attr('id', field.id);
