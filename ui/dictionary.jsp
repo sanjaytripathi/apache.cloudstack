@@ -1902,5 +1902,6 @@ dictionary = {
 'label.root.certificate': '<fmt:message key="label.root.certificate" />',
 'label.intermediate.certificate': '<fmt:message key="label.intermediate.certificate" />',
 'label.add.intermediate.certificate': '<fmt:message key="label.add.intermediate.certificate" />'
+
 };
 </script>
