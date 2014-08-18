@@ -15197,7 +15197,9 @@
                                                     }
 
                                                     args.response.success({
-                                                        data: tags
+                                                        data: tags,
+                                                        hintText: "Type in part of a host tag",
+                                                        noResultsText: "No host tags found"
                                                     });
                                                 },
                                                 error: function(XMLHttpResponse) {
@@ -15790,7 +15792,9 @@
                                                     }
 
                                                     args.response.success({
-                                                        data: tags
+                                                        data: tags,
+                                                        hintText: "Type in part of a host tag",
+                                                        noResultsText: "No host tags found"
                                                     });
                                                 },
                                                 error: function(XMLHttpResponse) {
@@ -16966,7 +16970,9 @@
                                                     }
 
                                                     args.response.success({
-                                                        data: tags
+                                                        data: tags,
+                                                        hintText: "Type in part of a storage tag",
+                                                        noResultsText: "No storage tags found"
                                                     });
                                                 },
                                                 error: function(XMLHttpResponse) {
@@ -17325,7 +17331,9 @@
                                                     }
 
                                                     args.response.success({
-                                                        data: tags
+                                                        data: tags,
+                                                        hintText: "Type in part of a storage tag",
+                                                        noResultsText: "No storage tags found"
                                                     });
                                                 },
                                                 error: function(XMLHttpResponse) {
