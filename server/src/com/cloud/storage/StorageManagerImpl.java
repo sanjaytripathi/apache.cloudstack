@@ -893,8 +893,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     }
 
     @Override
-    public BigDecimal getStorageOverProvisioningFactor(Long poolId) {
-        return new BigDecimal(CapacityManager.StorageOverprovisioningFactor.valueIn(poolId));
+    public BigDecimal getStorageOverProvisioningFactor(Long dcId) {
+        return new BigDecimal(CapacityManager.StorageOverprovisioningFactor.valueIn(dcId));
     }
 
     @Override
@@ -908,18 +908,13 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
         long totalOverProvCapacity;
         if (storagePool.getPoolType() == StoragePoolType.NetworkFilesystem || storagePool.getPoolType() == StoragePoolType.VMFS) {
-            // All this is for the inaccuracy of floats for big number multiplication.
-            BigDecimal overProvFactor = getStorageOverProvisioningFactor(storagePool.getId());
+            BigDecimal overProvFactor = getStorageOverProvisioningFactor(storagePool.getDataCenterId());
             totalOverProvCapacity = overProvFactor.multiply(new BigDecimal(storagePool.getCapacityBytes())).longValue();
-            s_logger.debug("Found storage pool " + storagePool.getName() + " of type " + storagePool.getPoolType().toString() + " with overprovisioning factor "
-                    + overProvFactor.toString());
-            s_logger.debug("Total over provisioned capacity calculated is " + overProvFactor + " * " + storagePool.getCapacityBytes());
+            // All this is for the inaccuracy of floats for big number multiplication.
         } else {
-            s_logger.debug("Found storage pool " + storagePool.getName() + " of type " + storagePool.getPoolType().toString());
             totalOverProvCapacity = storagePool.getCapacityBytes();
         }
 
-        s_logger.debug("Total over provisioned capacity of the pool " + storagePool.getName() + " id: " + storagePool.getId() + " is " + totalOverProvCapacity);
         if (capacities.size() == 0) {
             CapacityVO capacity =
                     new CapacityVO(storagePool.getId(), storagePool.getDataCenterId(), storagePool.getPodId(), storagePool.getClusterId(), allocated, totalOverProvCapacity,
@@ -1584,17 +1579,11 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
 
         long totalOverProvCapacity;
         if (pool.getPoolType() == StoragePoolType.NetworkFilesystem || pool.getPoolType() == StoragePoolType.VMFS) {
-            BigDecimal overProvFactor = getStorageOverProvisioningFactor(pool.getId());
-            totalOverProvCapacity = overProvFactor.multiply(new BigDecimal(pool.getCapacityBytes())).longValue();
-            s_logger.debug("Found storage pool " + poolVO.getName() + " of type " + pool.getPoolType().toString() + " with overprovisioning factor "
-                    + overProvFactor.toString());
-            s_logger.debug("Total over provisioned capacity calculated is " + overProvFactor + " * " + pool.getCapacityBytes());
+            totalOverProvCapacity = getStorageOverProvisioningFactor(pool.getDataCenterId()).multiply(new BigDecimal(pool.getCapacityBytes())).longValue();
         } else {
             totalOverProvCapacity = pool.getCapacityBytes();
-            s_logger.debug("Found storage pool " + poolVO.getName() + " of type " + pool.getPoolType().toString());
         }
 
-        s_logger.debug("Total capacity of the pool " + poolVO.getName() + " id: " + pool.getId() + " is " + totalOverProvCapacity);
         double storageAllocatedThreshold = CapacityManager.StorageAllocatedCapacityDisableThreshold.valueIn(pool.getDataCenterId());
         if (s_logger.isDebugEnabled()) {
             s_logger.debug("Checking pool: " + pool.getId() + " for volume allocation " + volumes.toString() + ", maxSize : " + totalOverProvCapacity +
