@@ -177,7 +177,6 @@ import com.cloud.service.dao.ServiceOfferingDao;
 import com.cloud.service.dao.ServiceOfferingDetailsDao;
 import com.cloud.storage.DiskOfferingVO;
 import com.cloud.storage.Storage.ProvisioningType;
-import com.cloud.storage.Storage.StoragePoolType;
 import com.cloud.storage.StorageManager;
 import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.test.IPRangeConfig;
@@ -470,11 +469,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
                 StoragePoolVO pool = _storagePoolDao.findById(resourceId);
                 if (pool == null) {
                     throw new InvalidParameterValueException("unable to find storage pool by id " + resourceId);
-                }
-                if(name.equals(CapacityManager.StorageOverprovisioningFactor.key())) {
-                    if(pool.getPoolType() != StoragePoolType.NetworkFilesystem && pool.getPoolType() != StoragePoolType.VMFS) {
-                        throw new InvalidParameterValueException("Unable to update  storage pool with id " + resourceId + ". Overprovision not supported for " + pool.getPoolType());
-                    }
                 }
 
                 _storagePoolDetailsDao.addDetail(resourceId, name, value, true);
