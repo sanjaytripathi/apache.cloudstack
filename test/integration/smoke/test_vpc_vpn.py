@@ -37,6 +37,10 @@ class TestVpcRemoteAccessVpn(cloudstackTestCase):
 
         cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
         cls.domain = get_domain(cls.apiclient)
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
+
         cls.service_offering = ServiceOffering.create(
             cls.apiclient,
             cls.services["service_offerings"]
@@ -145,6 +149,9 @@ class TestVpcSite2SiteVpn(cloudstackTestCase):
 
         cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
         cls.domain = get_domain(cls.apiclient)
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.service_offering = ServiceOffering.create(
             cls.apiclient,
             cls.services["service_offerings"]

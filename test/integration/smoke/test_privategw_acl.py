@@ -28,6 +28,9 @@ from nose.plugins.attrib import attr
 class TestPrivateGwACL(cloudstackTestCase):
     def setUp(self):
         self.apiClient = self.testClient.getApiClient()
+        self.hypervisor = self.testClient.getHypervisorInfo()
+        if self.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V so Private GW tests can be skipped for Hyper-V")
         self.networkOfferingId = 11
         self.networkId = None
         self.vmId = None
