@@ -2362,7 +2362,7 @@
                                             if ($("input[name='" + checkboxName + "']").is(":checked") == true) {
                                                 var providerFieldName = checkboxName.replace(".isEnabled", ".provider"); //either dropdown or input hidden field
                                                 var providerName = $("[name='" + providerFieldName + "']").val();
-                                                if (providerName == "VirtualRouter") {
+                                                if (providerName == "VirtualRouter" || providerName == "VpcVirtualRouter") {
                                                     havingVirtualRouterForAtLeastOneService = true;
                                                     return false; //break each loop
                                                 }
