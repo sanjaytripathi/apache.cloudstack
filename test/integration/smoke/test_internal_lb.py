@@ -37,6 +37,11 @@ class TestInternalLb(cloudstackTestCase):
 
         cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())
         cls.domain = get_domain(cls.apiclient)
+
+        cls.hypervisor = testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V so we can't test Internal load balancing on Hyper-v")
+
         cls.service_offering = ServiceOffering.create(
             cls.apiclient,
             cls.services["service_offerings"]
