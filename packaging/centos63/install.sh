@@ -174,6 +174,8 @@ if [ "$installtype" == "q" -o "$installtype" == "Q" ] ; then
             	    mysql_type=mysql-community-server
         	    if [[ `curl -s --head -w %{http_code} http://dev.mysql.com/ -o /dev/null` == "200" ]]; then
                        echo "Mysql repo http://dev.mysql.com server exist"
+                       rpm -Uvh http://dev.mysql.com/get/mysql-community-release-el7-5.noarch.rpm
+                       
         	    else 
             	       echo "Unable to acccess http://dev.mysql.com/, mysql repo not configured, please configure mysql server repo" 
                     fi
