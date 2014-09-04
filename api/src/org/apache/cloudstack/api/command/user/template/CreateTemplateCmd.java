@@ -282,7 +282,11 @@ public class CreateTemplateCmd extends BaseAsyncCreateCmd {
         CallContext.current().setEventDetails(
             "Template Id: " + getEntityId() + ((getSnapshotId() == null) ? " from volume Id: " + getVolumeId() : " from snapshot Id: " + getSnapshotId()));
         VirtualMachineTemplate template = null;
-        template = _templateService.createPrivateTemplate(this);
+        try {
+            template = _templateService.createPrivateTemplate(this);
+        } catch(Exception e) {
+            throw new ServerApiException(ApiErrorCode.INTERNAL_ERROR, "Failed to create private template");
+        }
 
         if (template != null) {
             List<TemplateResponse> templateResponses;
