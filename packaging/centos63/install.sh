@@ -272,8 +272,12 @@ while [ $# -gt 0 ] ; do
      echo "***** Installing the Agent *****"
 		if doinstallauto cloudstack-agent; then
                         modprobe kvm
-                        modprobe kvm_intel
-			echo "Agent installation is completed, please add the host from management server"
+                        modprobe kvm_intel > /dev/null 2>&1 
+                        modprobe kvm_amd > /dev/null 2>&1
+                        if [[ `cat /etc/redhat-release` =~ "6.5" ]]; then
+                           yum localinstall 6.5/ccp-qemu-img* -y
+                        fi
+			echo "Agent installation is completed, please add the host from management server" >&2
 		else
 			true
 		fi	
