@@ -780,7 +780,7 @@ CREATE VIEW `cloud`.`domain_router_view` AS
             and async_job.job_status = 0;
 
 INSERT IGNORE INTO `cloud`.`configuration` VALUES ("Advanced", 'DEFAULT', 'management-server', "vmware.vcenter.session.timeout", "1200", "VMware client timeout in seconds", "1200", NULL,NULL,0);
-INSERT IGNORE INTO `cloud`.`configuration` VALUES ("Advanced", 'DEFAULT', 'management-server', "mgt.server.vendor", "ACS", "the vendor of management server", "ACS", NULL,NULL,0);
+INSERT IGNORE INTO `cloud`.`configuration` VALUES ("Advanced", 'DEFAULT', 'management-server', "mgt.server.vendor", "CCP", "the vendor of management server", "CCP", NULL,NULL,0);
 Update `cloud`.`configuration` set `component` = "VolumeOrchestrationService", `scope` = "Global" where `name`="custom.diskoffering.size.max";
 Update `cloud`.`configuration` set `component` = "VolumeOrchestrationService", `scope` = "Global" where `name`="custom.diskoffering.size.min";
 
