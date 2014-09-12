@@ -46,11 +46,11 @@ echo Host.OS.Kernel.Version=${KERNEL}
 ccpQemuImgVersion=`rpm -qv ccp-qemu-img`
 if [ $? -eq 0 ]
 then
-    echo CCP.Qemu.Img.Version=$ccpQemuImgVersion
+    echo Qemu.Img.Version=$ccpQemuImgVersion
 fi
 
-ccpKvmAgentVersion=`rpm -qv cloudstack-agent`
-if [ $? -eq 0 ]
+ccpKvmAgentVersion=`rpm -qv cloudstack-agent|cut -d'-' -f3`
+if [ $? -eq 0 ] && [ ! -z "$ccpKvmAgentVersion" ]
 then
-    echo CCP.KVM.Agent.Version=$ccpKvmAgentVersion
+    echo KVM.Agent.Version="$ccpKvmAgentVersion"
 fi
