@@ -15,25 +15,25 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package org.apache.cloudstack.saml;
+package com.cloud.upgrade.dao;
 
-import org.apache.cloudstack.api.auth.PluggableAPIAuthenticator;
+import org.apache.log4j.Logger;
 
-import java.security.KeyPair;
-import java.security.cert.X509Certificate;
+public class Upgrade431to440 extends Upgrade430to440 implements DbUpgrade {
+    final static Logger s_logger = Logger.getLogger(Upgrade431to440.class);
 
-public interface SAML2AuthManager extends PluggableAPIAuthenticator {
-    public String getServiceProviderId();
-    public String getIdentityProviderId();
+    @Override
+    public String[] getUpgradableVersionRange() {
+        return new String[] {"4.3.1", "4.4.0"};
+    }
 
-    public X509Certificate getIdpSigningKey();
-    public X509Certificate getIdpEncryptionKey();
-    public X509Certificate getSpX509Key();
-    public KeyPair getSpKeyPair();
+    @Override
+    public String getUpgradedVersion() {
+        return "4.4.0";
+    }
 
-    public String getSpSingleSignOnUrl();
-    public String getIdpSingleSignOnUrl();
-
-    public String getSpSingleLogOutUrl();
-    public String getIdpSingleLogOutUrl();
+    @Override
+    public boolean supportsRollingUpgrade() {
+        return false;
+    }
 }

@@ -55,7 +55,6 @@ import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.io.MarshallingException;
 import org.opensaml.xml.io.UnmarshallingException;
 import org.opensaml.xml.security.x509.BasicX509Credential;
-import org.opensaml.xml.signature.Signature;
 import org.opensaml.xml.signature.SignatureValidator;
 import org.opensaml.xml.validation.ValidationException;
 import org.xml.sax.SAXException;
@@ -68,6 +67,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.util.List;
 import java.util.Map;
 
@@ -134,8 +136,12 @@ public class SAML2LoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthent
         try {
             DefaultBootstrap.bootstrap();
             AuthnRequest authnRequest = SAMLUtils.buildAuthnRequestObject(spId, identityProviderUrl, consumerUrl);
-            redirectUrl = identityProviderUrl + "?SAMLRequest=" + SAMLUtils.encodeSAMLRequest(authnRequest);
-        } catch (ConfigurationException | FactoryConfigurationError | MarshallingException | IOException e) {
+            PrivateKey privateKey = null;
+            if (_samlAuthManager.getSpKeyPair() != null) {
+                privateKey = _samlAuthManager.getSpKeyPair().getPrivate();
+            }
+            redirectUrl = identityProviderUrl + "?" + SAMLUtils.generateSAMLRequestSignature("SAMLRequest=" + SAMLUtils.encodeSAMLRequest(authnRequest), privateKey);
+        } catch (ConfigurationException | FactoryConfigurationError | MarshallingException | IOException | NoSuchAlgorithmException | InvalidKeyException | java.security.SignatureException e) {
             s_logger.error("SAML AuthnRequest message building error: " + e.getMessage());
         }
         return redirectUrl;
@@ -156,7 +162,7 @@ public class SAML2LoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthent
     @Override
     public String authenticate(final String command, final Map<String, Object[]> params, final HttpSession session, final String remoteAddress, final String responseType, final StringBuilder auditTrailSb, final HttpServletResponse resp) throws ServerApiException {
         try {
-            if (!params.containsKey("SAMLResponse")) {
+            if (!params.containsKey("SAMLResponse") && !params.containsKey("SAMLart")) {
                 String idpUrl = null;
                 final String[] idps = (String[])params.get(ApiConstants.IDP_URL);
                 if (idps != null && idps.length > 0) {
@@ -165,6 +171,10 @@ public class SAML2LoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthent
                 String redirectUrl = this.buildAuthnRequestUrl(idpUrl);
                 resp.sendRedirect(redirectUrl);
                 return "";
+            } if (params.containsKey("SAMLart")) {
+                throw new ServerApiException(ApiErrorCode.UNSUPPORTED_ACTION_ERROR, _apiServer.getSerializedApiError(ApiErrorCode.UNSUPPORTED_ACTION_ERROR.getHttpCode(),
+                        "SAML2 HTTP Artifact Binding is not supported",
+                        params, responseType));
             } else {
                 final String samlResponse = ((String[])params.get(SAMLUtils.SAML_RESPONSE))[0];
                 Response processedSAMLResponse = this.processSAMLResponse(samlResponse);
@@ -176,7 +186,7 @@ public class SAML2LoginAPIAuthenticatorCmd extends BaseCmd implements APIAuthent
                 }
 
                 if (_samlAuthManager.getIdpSigningKey() != null) {
-                    Signature sig = processedSAMLResponse.getSignature();
+                    org.opensaml.xml.signature.Signature sig = processedSAMLResponse.getSignature();
                     BasicX509Credential credential = new BasicX509Credential();
                     credential.setEntityCertificate(_samlAuthManager.getIdpSigningKey());
                     SignatureValidator validator = new SignatureValidator(credential);
