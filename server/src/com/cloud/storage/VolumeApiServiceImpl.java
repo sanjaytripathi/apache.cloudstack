@@ -105,6 +105,7 @@ import com.cloud.storage.dao.DiskOfferingDao;
 import com.cloud.storage.dao.SnapshotDao;
 import com.cloud.storage.dao.VMTemplateDao;
 import com.cloud.storage.dao.VolumeDao;
+import com.cloud.storage.dao.VolumeDetailsDao;
 import com.cloud.storage.snapshot.SnapshotApiService;
 import com.cloud.storage.snapshot.SnapshotManager;
 import com.cloud.template.TemplateManager;
@@ -137,6 +138,7 @@ import com.cloud.vm.UserVmVO;
 import com.cloud.vm.VMInstanceVO;
 import com.cloud.vm.VirtualMachine;
 import com.cloud.vm.VirtualMachine.State;
+import com.cloud.vm.VmDetailConstants;
 import com.cloud.vm.VmWork;
 import com.cloud.vm.VmWorkConstants;
 import com.cloud.vm.VmWorkJobHandler;
@@ -167,6 +169,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
     ConfigurationManager _configMgr;
     @Inject
     VolumeDao _volsDao;
+    @Inject
+    VolumeDetailsDao _volDetailDao;
     @Inject
     HostDao _hostDao;
     @Inject
@@ -1600,18 +1604,20 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
         boolean sendCommand = vm.getState() == State.Running;
 
         Long hostId = vm.getHostId();
-
+        HostVO host = null;
         if (hostId == null) {
             hostId = vm.getLastHostId();
 
-            HostVO host = _hostDao.findById(hostId);
+            host = _hostDao.findById(hostId);
 
             if (host != null && host.getHypervisorType() == HypervisorType.VMware) {
                 sendCommand = true;
             }
+        } else {
+            host = _hostDao.findById(hostId);
         }
 
-        HostVO host = null;
+        host = null;
         StoragePoolVO volumePool = _storagePoolDao.findById(volume.getPoolId());
 
         if (hostId != null) {
@@ -2203,6 +2209,9 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                 details.put(DiskTO.CHAP_TARGET_USERNAME, chapInfo.getTargetUsername());
                 details.put(DiskTO.CHAP_TARGET_SECRET, chapInfo.getTargetSecret());
             }
+            _userVmDao.loadDetails(vm);
+            String diskController = vm.getDetail(VmDetailConstants.DATA_DISK_CONTROLLER);
+            cmd.setDiskController(diskController);
 
             try {
                 answer = (AttachAnswer)_agentMgr.send(hostId, cmd);
@@ -2226,6 +2235,15 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     volumeToAttach.setPath(answer.getDisk().getPath());
 
                     _volsDao.update(volumeToAttach.getId(), volumeToAttach);
+                }
+                // Update volumes details
+                if (host.getHypervisorType() == HypervisorType.VMware) {
+                    // Retrieve volume details from Answer and persist in volume_details table.
+                    Map<String, String> diskDetails = answer.getDiskDetails();
+                    for (Map.Entry<String, String> detail : diskDetails.entrySet()) {
+                        VolumeDetailVO volumeDetailVo = new VolumeDetailVO(volumeToAttach.getId(), detail.getKey(), detail.getValue(), true);
+                        _volDetailDao.persist(volumeDetailVo);
+                    }
                 }
             } else {
                 _volsDao.attachVolume(volumeToAttach.getId(), vm.getId(), deviceId);

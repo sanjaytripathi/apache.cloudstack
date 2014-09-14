@@ -22,6 +22,7 @@ import java.util.List;
 import javax.ejb.Local;
 import javax.inject.Inject;
 
+import org.apache.cloudstack.api.ApiConstants;
 import org.apache.cloudstack.api.ResponseObject.ResponseView;
 import org.apache.cloudstack.api.response.VolumeResponse;
 import org.apache.cloudstack.context.CallContext;
@@ -38,6 +39,8 @@ import com.cloud.storage.Storage;
 import com.cloud.storage.VMTemplateHostVO;
 import com.cloud.storage.VMTemplateStorageResourceAssoc.Status;
 import com.cloud.storage.Volume;
+import com.cloud.storage.VolumeDetailVO;
+import com.cloud.storage.dao.VolumeDetailsDao;
 import com.cloud.user.Account;
 import com.cloud.user.AccountManager;
 import com.cloud.utils.db.GenericDaoBase;
@@ -53,6 +56,8 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
     private ConfigurationDao  _configDao;
     @Inject
     public AccountManager _accountMgr;
+    @Inject
+    private VolumeDetailsDao _volDetailsDao;
 
     private final SearchBuilder<VolumeJoinVO> volSearch;
 
@@ -219,6 +224,12 @@ public class VolumeJoinDaoImpl extends GenericDaoBase<VolumeJoinVO, Long> implem
             if (vtag != null) {
                 volResponse.addTag(ApiDBUtils.newResourceTagResponse(vtag, false));
             }
+        }
+
+        // update volume details information
+        VolumeDetailVO volDetailVo = _volDetailsDao.findDetail(volume.getId(), ApiConstants.PCI_DEVICE_PATH);
+        if (volDetailVo != null) {
+            volResponse.setPciDevicePath(volDetailVo.getValue());
         }
 
         volResponse.setExtractable(isExtractable);

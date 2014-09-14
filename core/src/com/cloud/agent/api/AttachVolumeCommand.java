@@ -44,6 +44,7 @@ public class AttachVolumeCommand extends Command {
     private Long iopsReadRate;
     private Long iopsWriteRate;
     private String cacheMode;
+    private String diskController;
 
     protected AttachVolumeCommand() {
     }
@@ -212,5 +213,13 @@ public class AttachVolumeCommand extends Command {
 
     public String getCacheMode() {
         return cacheMode;
+    }
+
+    public String getDiskController() {
+        return diskController;
+    }
+
+    public void setDiskController(String diskController) {
+        this.diskController = diskController;
     }
 }
