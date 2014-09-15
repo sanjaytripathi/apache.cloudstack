@@ -47,6 +47,13 @@ unset OPTIONS
 [ -r /etc/sysconfig/default/"$SHORTNAME" ] && source /etc/sysconfig/default/"$SHORTNAME"
 
 setJavaHome() {
+
+  #The first existing directory is used for JAVA_HOME (if JAVA_HOME is not defined in $DEFAULT)
+  if   [[ ! -d "$JAVA_HOME" && -d /usr/lib/jvm/jre-1.7.0 ]]; then
+        export JAVA_HOME=/usr/lib/jvm/jre-1.7.0
+        PATH=$JAVA_HOME/bin:$PATH
+  fi
+
   # use $JAVA_HOME if defined
   if [ -n "$JAVA_HOME" ] ; then
     return
