@@ -350,8 +350,8 @@ class TestVMLifeCycleHostmaintenance(cloudstackTestCase):
     def tearDownClass(cls):
         try:
             #Delete the host tags
-            Host.update(cls.api_client, id=cls.hosts[0].id, hosttags="hosttag1")
-            Host.update(cls.api_client, id=cls.hosts[1].id, hosttags="hosttag2")
+            Host.update(cls.api_client, id=cls.hosts[0].id, hosttags="")
+            Host.update(cls.api_client, id=cls.hosts[1].id, hosttags="")
             cls.account.delete(cls.api_client)
             wait_for_cleanup(cls.api_client, ["account.cleanup.interval"])
             #Cleanup resources used
