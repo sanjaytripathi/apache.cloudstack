@@ -87,10 +87,10 @@
                             }
                         },
                         tagKey: {
-                            label: 'Tag Key'
+                            label: 'label.tag.key'
                         },
                         tagValue: {
-                            label: 'Tag Value'
+                            label: 'label.tag.value'
                         }
                     },
 
@@ -123,7 +123,7 @@
                                         }
                                     },
                                     url: {
-                                        label: 'URL',
+                                        label: 'label.url',
                                         docID: 'helpRegisterTemplateURL',
                                         validation: {
                                             required: true
@@ -907,7 +907,7 @@
                                         }
                                     },
                                     isextractable: {
-                                        label: 'extractable',
+                                        label: 'label.extractable',
                                         isBoolean: true,
                                         isEditable: function() {
                                             if (isAdmin())
@@ -924,7 +924,7 @@
                                         converter: cloudStack.converters.toBooleanText
                                     },
                                     isdynamicallyscalable: {
-                                        label: 'Dynamically Scalable',
+                                        label: 'label.dynamically.scalable',
                                         isBoolean: true,
                                         isEditable: true,
                                         converter: cloudStack.converters.toBooleanText
@@ -1497,7 +1497,7 @@
                                         }
                                     },
                                     url: {
-                                        label: 'URL',
+                                        label: 'label.url',
                                         docID: 'helpRegisterISOURL',
                                         validation: {
                                             required: true
@@ -1925,7 +1925,7 @@
                                     }
                                 }, {
                                     id: {
-                                        label: 'ID'
+                                        label: 'label.id'
                                     },
                                     displaytext: {
                                         label: 'label.description',
@@ -1944,7 +1944,7 @@
                                         }
                                     },
                                     isextractable: {
-                                        label: 'extractable',
+                                        label: 'label.extractable',
                                         isBoolean: true,
                                         isEditable: function() {
                                             if (isAdmin())

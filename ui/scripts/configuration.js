@@ -455,7 +455,7 @@
                                     },
 
                                     pciDevice: {
-                                        label: 'GPU',
+                                        label: 'label.gpu',
                                         select: function(args) {
                                             var items = [];
                                             items.push({
@@ -508,7 +508,7 @@
                                     },
 
                                     vgpuType: {
-                                        label: 'vGPU Type',
+                                        label: 'label.vgpu.type',
                                         isHidden: true,
                                         select: function(args) {
                                             var items = [];
@@ -927,20 +927,20 @@
                                         converter: cloudStack.converters.toBooleanText
                                     },
                                     isvolatile: {
-                                        label: 'Volatile',
+                                        label: 'label.volatile',
                                         converter: cloudStack.converters.toBooleanText
                                     },
                                     deploymentplanner: {
-                                        label: 'Deployment Planner'
+                                        label: 'label.deployment.planner'
                                     },                                    
                                     plannerMode: {
-                                        label: 'Planner Mode'
+                                        label: 'label.planner.mode'
                                     },                                    
                                     pciDevice: {
-                                        label: 'GPU'
+                                        label: 'label.gpu'
                                     },
                                     vgpuType: {
-                                        label: 'vGPU type'
+                                        label: 'label.vgpu.type'
                                     },
                                     tags: {
                                         label: 'label.storage.tags'
@@ -2604,7 +2604,7 @@
                                     },
 
                                     isPersistent: {
-                                        label: 'Persistent ',
+                                        label: 'label.persistent',
                                         isBoolean: true,
                                         isChecked: false
 
@@ -2618,13 +2618,13 @@
                                     },
 
                                     useVpc: {
-                                        label: 'VPC',
+                                        label: 'label.vpc',
                                         docID: 'helpNetworkOfferingVPC',
                                         isBoolean: true
                                     },
 
                                     lbType: { //only shown when VPC is checked and LB service is checked
-                                        label: 'Load Balancer Type',
+                                        label: 'label.load.balancer.type',
                                         isHidden: true,
                                         select: function(args) {
                                             args.response.success({
@@ -3127,7 +3127,7 @@
 
                             messages: {
                                 notification: function(args) {
-                                    return 'Added network offering';
+                                    return 'label.added.network.offering';
                                 }
                             }
                         }

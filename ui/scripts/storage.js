@@ -327,7 +327,7 @@
                                     },
                                     checksum: {
                                         docID: 'helpUploadVolumeChecksum',
-                                        label: 'label.checksum'
+                                        label: 'label.md5.checksum'
                                     }
                                 }
                             },
@@ -377,10 +377,10 @@
 
                     advSearchFields: {
                         name: {
-                            label: 'Name'
+                            label: 'label.name'
                         },
                         zoneid: {
-                            label: 'Zone',
+                            label: 'label.zone',
                             select: function(args) {
                                 $.ajax({
                                     url: createURL('listZones'),
@@ -404,7 +404,7 @@
                         },
 
                         domainid: {
-                            label: 'Domain',
+                            label: 'label.domain',
                             select: function(args) {
                                 if (isAdmin() || isDomainAdmin()) {
                                     $.ajax({
@@ -447,7 +447,7 @@
                         },
 
                         account: {
-                            label: 'Account',
+                            label: 'label.account',
                             isHidden: function(args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
@@ -457,10 +457,10 @@
                         },
 
                         tagKey: {
-                            label: 'Tag Key'
+                            label: 'label.tag.key'
                         },
                         tagValue: {
-                            label: 'Tag Value'
+                            label: 'label.tag.value'
                         }
                     },
 
@@ -490,7 +490,7 @@
                     },
 
                     detailView: {
-                        name: 'Volume details',
+                        name: 'label.volume.details',
                         viewAll: {
                             path: 'storage.snapshots',
                             label: 'label.snapshots'
@@ -498,22 +498,22 @@
                         actions: {
 
                             migrateVolume: {
-                                label: 'Migrate Volume',
+                                label: 'label.migrate.volume',
                                 messages: {
                                     confirm: function(args) {
-                                        return 'Do you want to migrate this volume ?';
+                                        return 'message.confirm.migrate.volume';
                                     },
                                     notification: function(args) {
-                                        return 'Volume migrated';
+                                        return 'label.volume.migrated';
                                     }
                                 },
 
                                 createForm: {
-                                    title: 'Migrate Volume',
+                                    title: 'label.migrate.volume',
                                     desc: '',
                                     fields: {
                                         storagePool: {
-                                            label: 'Storage Pool',
+                                            label: 'label.storage.pool',
                                             validation: {
                                                 required: true
                                             },
@@ -865,7 +865,7 @@
                                 label: 'label.action.attach.disk',
                                 messages: {
                                     confirm: function(args) {
-                                        return 'Are you sure you want to attach disk?';
+                                        return 'message.confirm.attach.disk';
                                     },
                                     notification: function(args) {
                                         return 'label.action.attach.disk';
@@ -1160,17 +1160,17 @@
                             },
 
                             migrateToAnotherStorage: {
-                                label: 'label.migrate.volume',
+                                label: 'label.migrate.volume.to.primary.storage',
                                 messages: {
                                     confirm: function(args) {
                                         return 'message.migrate.volume';
                                     },
                                     notification: function(args) {
-                                        return 'label.migrate.volume';
+                                        return 'label.migrate.volume.to.primary.storage';
                                     }
                                 },
                                 createForm: {
-                                    title: 'label.migrate.volume',
+                                    title: 'label.migrate.volume.to.primary.storage',
                                     desc: '',
                                     fields: {
                                         storageId: {
@@ -1425,7 +1425,7 @@
                                     }
                                 }, {
                                     id: {
-                                        label: 'ID'
+                                        label: 'label.id'
                                     },
                                     zonename: {
                                         label: 'label.zone'
@@ -1467,7 +1467,7 @@
                                         label: 'label.hypervisor'
                                     },
                                     size: {
-                                        label: 'Size ',
+                                        label: 'label.size',
                                         converter: function(args) {
                                             if (args == null || args == 0)
                                                 return "";
@@ -1494,10 +1494,10 @@
                                         }
                                     },
                                     virtualmachineid: {
-                                        label: 'VM ID',
+                                        label: 'label.vm.id',
                                         converter: function(args) {
                                             if (args == null)
-                                                return "detached";
+                                                return 'state.detached';
                                             else
                                                 return args;
                                         }
@@ -1589,11 +1589,11 @@
 
                     advSearchFields: {
                         name: {
-                            label: 'Name'
+                            label: 'label.name'
                         },
 
                         domainid: {
-                            label: 'Domain',
+                            label: 'label.domain',
                             select: function(args) {
                                 if (isAdmin() || isDomainAdmin()) {
                                     $.ajax({
@@ -1636,7 +1636,7 @@
                         },
 
                         account: {
-                            label: 'Account',
+                            label: 'label.account',
                             isHidden: function(args) {
                                 if (isAdmin() || isDomainAdmin())
                                     return false;
@@ -1645,10 +1645,10 @@
                             }
                         },
                         tagKey: {
-                            label: 'Tag Key'
+                            label: 'label.tag.key'
                         },
                         tagValue: {
-                            label: 'Tag Value'
+                            label: 'label.tag.value'
                         }
                     },
 
@@ -1798,7 +1798,7 @@
                                 label: 'label.action.create.volume',
                                 messages: {
                                     confirm: function(args) {
-                                        return 'Are you sure you want to create volume?';
+                                        return 'message.confirm.create.volume';
                                     },
                                     notification: function(args) {
                                         return 'label.action.create.volume';
