@@ -1656,7 +1656,7 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
                     continue;
 
                 VirtualMachineDiskInfo matchingExistingDisk = getMatchingExistingDisk(diskInfoBuilder, vol);
-
+                controllerKey = getDiskController(matchingExistingDisk, vol, vmSpec, ideControllerKey, scsiControllerKey);
                 String diskController = getDiskController(vmMo, matchingExistingDisk, vol, new Pair<String, String>(rootDiskController, dataDiskController));
 
                 if (DiskControllerType.getType(diskController) == DiskControllerType.osdefault) {
