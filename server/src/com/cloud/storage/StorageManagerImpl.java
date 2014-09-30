@@ -542,7 +542,12 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
         }
         DataStore store;
         try {
-            StoragePoolVO pool = _storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), pInfo.getHost(), pInfo.getHostPath(), pInfo.getUuid());
+            String hostAddress = pInfo.getHost();
+            if (host.getHypervisorType() == HypervisorType.VMware) {
+                hostAddress = "VMFS datastore: " + pInfo.getHostPath();
+            }
+            StoragePoolVO pool = _storagePoolDao.findPoolByHostPath(host.getDataCenterId(), host.getPodId(), hostAddress, pInfo.getHostPath(),
+                    pInfo.getUuid());
             if (pool == null && host.getHypervisorType() == HypervisorType.VMware) {
                 // perform run-time upgrade. In versions prior to 2.2.12, there
                 // is a bug that we don't save local datastore info (host path
