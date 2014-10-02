@@ -1497,7 +1497,7 @@
                                         label: 'label.vm.id',
                                         converter: function(args) {
                                             if (args == null)
-                                                return 'state.detached';
+                                                return _l('state.detached');
                                             else
                                                 return args;
                                         }

@@ -2082,7 +2082,7 @@
                                             label: 'label.action.copy.ISO',
                                             messages: {
                                                 notification: function(args) {
-                                                    return 'Copying ISO';
+                                                    return 'label.copying.iso';
                                                 }
                                             },
                                             createForm: {

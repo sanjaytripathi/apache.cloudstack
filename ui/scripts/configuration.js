@@ -3311,7 +3311,7 @@
                                     },
 
                                     ispersistent: {
-                                        label: 'label.persistent ',
+                                        label: 'label.persistent',
                                         converter: cloudStack.converters.toBooleanText
                                     },
 
