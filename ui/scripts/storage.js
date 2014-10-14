@@ -1454,6 +1454,9 @@
                                     status: {
                                         label: 'label.status'
                                     },
+                                    diskofferingdisplaytext: {
+                                    	label: 'Disk Offering'
+                                    },
                                     type: {
                                         label: 'label.type'
                                     },
