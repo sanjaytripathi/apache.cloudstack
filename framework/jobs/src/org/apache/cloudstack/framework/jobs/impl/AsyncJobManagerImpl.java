@@ -528,8 +528,10 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                     // guard final clause as well
                     try {
                         AsyncJobVO jobToUpdate = _jobDao.findById(job.getId());
-                        jobToUpdate.setExecutingMsid(null);
-                        _jobDao.update(job.getId(), jobToUpdate);
+                        if(jobToUpdate != null) {
+                            jobToUpdate.setExecutingMsid(null);
+                            _jobDao.update(job.getId(), jobToUpdate);
+                        }
 
                         if (job.getSyncSource() != null) {
                             _queueMgr.purgeItem(job.getSyncSource().getId());
@@ -653,7 +655,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
             while (timeoutInMiliseconds < 0 || System.currentTimeMillis() - startTick < timeoutInMiliseconds) {
                 msgDetector.waitAny(checkIntervalInMilliSeconds);
                 job = _jobDao.findById(job.getId());
-                if (job.getStatus().done()) {
+                if (job != null && job.getStatus().done()) {
                     return true;
                 }
 
@@ -678,7 +680,7 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
     @Override
     public Object unmarshallResultObject(AsyncJob job) {
-        if(job.getResult() != null)
+        if(job != null && job.getResult() != null)
             return JobSerializerHelper.fromObjectSerializedString(job.getResult());
         return null;
     }
