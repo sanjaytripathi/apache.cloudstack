@@ -576,6 +576,13 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
                     "VM Snapshot reverting failed due to vm is not in the state of Running or Stopped.");
         }
 
+        if (userVm.getState() == VirtualMachine.State.Running && vmSnapshotVo.getType() == VMSnapshot.Type.Disk || userVm.getState() == VirtualMachine.State.Stopped
+                && vmSnapshotVo.getType() == VMSnapshot.Type.DiskAndMemory) {
+            throw new InvalidParameterValueException(
+                    "VM Snapshot revert not allowed. This will result in VM state change. You can revert running VM to disk and memory type snapshot and stopped VM to disk type"
+                            + " snapshot");
+        }
+
         // if snapshot is not created, error out
         if (vmSnapshotVo.getState() != VMSnapshot.State.Ready) {
             throw new InvalidParameterValueException(
