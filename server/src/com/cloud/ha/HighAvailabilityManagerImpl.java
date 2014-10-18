@@ -28,7 +28,6 @@ import java.util.concurrent.TimeUnit;
 import javax.ejb.Local;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
-
 import org.apache.log4j.Logger;
 import org.apache.log4j.NDC;
 
@@ -632,6 +631,9 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             _haDao.update(work.getId(), work);
 
             VMInstanceVO vm = _instanceDao.findById(vmId);
+            if(vm == null){
+                return null;
+            }
             // First try starting the vm with its original planner, if it doesn't succeed send HAPlanner as its an emergency.
             _itMgr.migrateAway(vm.getUuid(), srcHostId);
             return null;
@@ -751,7 +753,10 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
         List<HaWorkVO> works = _haDao.findTakenWorkItems(WorkType.Migration);
         List<VMInstanceVO> vms = new ArrayList<VMInstanceVO>(works.size());
         for (HaWorkVO work : works) {
-            vms.add(_instanceDao.findById(work.getInstanceId()));
+            VMInstanceVO vm = _instanceDao.findById(work.getInstanceId());
+            if (vm != null) {
+                vms.add(vm);
+            }
         }
         return vms;
     }
