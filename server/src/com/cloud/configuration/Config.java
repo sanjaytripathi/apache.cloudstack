@@ -713,7 +713,7 @@ public enum Config {
             ManagementServer.class,
             Boolean.class,
             "system.vm.random.password",
-            "false",
+            "true",
             "Randomize system vm password the first time management server starts",
             null),
     LinkLocalIpNums("Advanced", ManagementServer.class, Integer.class, "linkLocalIp.nums", "10", "The number of link local ip that needed by domR(in power of 2)", null),
