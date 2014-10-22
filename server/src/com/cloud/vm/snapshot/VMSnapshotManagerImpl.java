@@ -261,7 +261,7 @@ public class VMSnapshotManagerImpl extends ManagerBase implements VMSnapshotMana
             throw new InvalidParameterValueException("Creating VM snapshot failed due to VM:" + vmId + " is a system VM or does not exist");
         }
 
-        if (_snapshotDao.listByInstanceId(vmId).size() > 0) {
+        if (_snapshotDao.listByInstanceId(vmId, Snapshot.State.BackedUp).size() > 0) {
             throw new InvalidParameterValueException(
                     "VM snapshot for this VM is not allowed. This VM has volumes attached which has snapshots, please remove all snapshots before taking VM snapshot");
         }
