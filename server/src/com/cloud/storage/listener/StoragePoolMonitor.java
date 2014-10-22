@@ -20,6 +20,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.apache.cloudstack.alert.AlertService;
 import org.apache.log4j.Logger;
 
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
@@ -32,6 +33,7 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StartupCommand;
 import com.cloud.agent.api.StartupRoutingCommand;
+import com.cloud.alert.AlertManager;
 import com.cloud.exception.ConnectionException;
 import com.cloud.host.Host;
 import com.cloud.host.Status;
@@ -48,6 +50,8 @@ public class StoragePoolMonitor implements Listener {
     private final PrimaryDataStoreDao _poolDao;
     @Inject
     OCFS2Manager _ocfs2Mgr;
+    @Inject
+    AlertManager alertManager;
 
     public StoragePoolMonitor(StorageManagerImpl mgr, PrimaryDataStoreDao poolDao) {
         this._storageManager = mgr;
@@ -104,7 +108,9 @@ public class StoragePoolMonitor implements Listener {
                         _storageManager.connectHostToSharedPool(hostId, pool.getId());
                         _storageManager.createCapacityEntry(pool.getId());
                     } catch (Exception e) {
-                        s_logger.warn("Unable to connect host " + hostId + " to pool " + pool + " due to " + e.toString(), e);
+                        String msg = "Unable to connect host " + hostId + " to pool " + pool + " due to " + e.toString();
+                        alertManager.sendAlert(AlertService.AlertType.ALERT_TYPE_STORAGE, host.getDataCenterId(), host.getPodId(), "can't connect host to pool", msg);
+                        s_logger.warn(msg, e);
                     }
                 }
             }
