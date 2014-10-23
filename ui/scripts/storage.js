@@ -1998,7 +1998,7 @@
     };
 
 
-    var volumeActionfilter = cloudStack.sections.storage.sections.volumes.volumeActionfilter = function(args) {
+    var volumeActionfilter = cloudStack.actionFilter.volumeActionfilter = function(args) {
         var jsonObj = args.context.item;
         var allowedActions = [];
 
@@ -2065,7 +2065,7 @@
         return allowedActions;
     };
 
-    var snapshotActionfilter = cloudStack.sections.storage.sections.snapshots.snapshotActionfilter = function(args) {
+    var snapshotActionfilter = cloudStack.actionFilter.snapshotActionfilter = function(args) {
         var jsonObj = args.context.item;
 
         if (jsonObj.state == 'Destroyed') {
