@@ -38,7 +38,6 @@ import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
 import org.apache.log4j.Logger;
-
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupService;
@@ -326,6 +325,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
     private int _maxVolumeSizeInGb = Integer.parseInt(Config.MaxVolumeSize.getDefaultValue());
     private long _defaultPageSize = Long.parseLong(Config.DefaultPageSize.getDefaultValue());
+    private static final String DOMAIN_NAME_PATTERN = "^((?!-)[A-Za-z0-9-]{1,63}(?<!-)\\.)+[A-Za-z]{2,6}$";
     protected Set<String> configValuesForValidation;
     private Set<String> weightBasedParametersForValidation;
     private Set<String> overprovisioningFactorsForValidation;
@@ -816,6 +816,14 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             } else if (range.equalsIgnoreCase("instanceName")) {
                 if (!NetUtils.verifyInstanceName(value)) {
                     return "Instance name can not contain hyphen, space or plus sign";
+                }
+            } else if (range.equalsIgnoreCase("domainName")) {
+                String domainName = value;
+                if(value.startsWith("*")) {
+                    domainName = value.substring(2); //skip the "*."
+                }
+                if (!domainName.matches(DOMAIN_NAME_PATTERN)) {
+                    return "Please enter a valid string for domain name, prefixed with '*.' if applicable";
                 }
             } else if (range.equals("routes")) {
                 String[] routes = value.split(",");

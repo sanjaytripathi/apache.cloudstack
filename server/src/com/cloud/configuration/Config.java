@@ -438,7 +438,7 @@ public enum Config {
             "Console proxy command port that is used to communicate with management server",
             null),
     ConsoleProxyRestart("Console Proxy", AgentManager.class, Boolean.class, "consoleproxy.restart", "true", "Console proxy restart flag, defaulted to true", null),
-    ConsoleProxyUrlDomain("Console Proxy", AgentManager.class, String.class, "consoleproxy.url.domain", "", "Console proxy url domain", null),
+    ConsoleProxyUrlDomain("Console Proxy", AgentManager.class, String.class, "consoleproxy.url.domain", "", "Console proxy url domain", "domainName"),
     ConsoleProxyLoadscanInterval(
             "Console Proxy",
             AgentManager.class,
@@ -774,7 +774,7 @@ public enum Config {
             "secstorage.ssl.cert.domain",
             "",
             "SSL certificate used to encrypt copy traffic between zones",
-            null),
+            "domainName"),
     SecStorageCapacityStandby(
             "Advanced",
             AgentManager.class,
