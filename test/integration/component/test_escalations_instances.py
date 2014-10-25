@@ -260,8 +260,17 @@ class TestListInstances(cloudstackTestCase):
                                  "VM listed in page 2 is also listed in page 1"
                                  )
 
-        # Deleting a single VM
-        VirtualMachine.delete(vm_created, self.userapiclient, expunge=True)
+        # Deleting a single VM        
+        cmd = destroyVirtualMachine.destroyVirtualMachineCmd()
+        cmd.id = vm_created.id
+        self.userapiclient.destroyVirtualMachine(cmd)
+        
+        #Wait for expunge.interval + expunge.delay seconds for the VM to get expunged.
+        #        
+        #In order to make sure that this test doesnt get effected due to 
+        #the default expunge time of 1 day, consciously hardcoding the sleep time to
+        # 150 seconds
+        sleep(150)
 
         # Listing the VM's in page 2
         list_instance_response = VirtualMachine.list(
@@ -504,7 +513,10 @@ class TestListInstances(cloudstackTestCase):
                              "VM creation failed"
                              )
         # Destroying the VM
-        VirtualMachine.delete(vm_created, self.userapiclient, expunge=False)
+        cmd = destroyVirtualMachine.destroyVirtualMachineCmd()
+        cmd.id = vm_created.id
+        self.userapiclient.destroyVirtualMachine(cmd)
+        
         # Listing all the Destroyed VM's for a User
         list_destroyed_vms_after = VirtualMachine.list(
                                                       self.userapiclient,
