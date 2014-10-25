@@ -266,11 +266,11 @@ class TestListInstances(cloudstackTestCase):
         self.userapiclient.destroyVirtualMachine(cmd)
         
         #Wait for expunge.interval + expunge.delay seconds for the VM to get expunged.
-        #        
-        #In order to make sure that this test doesnt get effected due to 
-        #the default expunge time of 1 day, consciously hardcoding the sleep time to
-        # 150 seconds
-        sleep(150)
+        list_delay = Configurations.list(self.apiClient, name = "expunge.delay")
+        list_interval = Configurations.list(self.apiClient, name = "expunge.interval")
+        
+        expungetime = int(list_delay[0].value) + int(list_interval[0].value)
+        sleep(expungetime)
 
         # Listing the VM's in page 2
         list_instance_response = VirtualMachine.list(
