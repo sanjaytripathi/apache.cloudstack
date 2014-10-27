@@ -35,8 +35,6 @@ import javax.ejb.Local;
 import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
-import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 
@@ -89,6 +87,8 @@ import org.apache.cloudstack.storage.command.DeleteCommand;
 import org.apache.cloudstack.storage.command.DettachCommand;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
+import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
+import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
 
 import com.cloud.agent.AgentManager;
 import com.cloud.agent.api.Answer;
@@ -4722,8 +4722,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
             // If target VM has associated VM snapshots then don't allow restore of VM
             List<VMSnapshotVO> vmSnapshots = _vmSnapshotDao.findByVm(vmId);
-            if (vmSnapshots.size() > 0 && vm.getHypervisorType() == HypervisorType.VMware) {
-                throw new InvalidParameterValueException("Unable to restore VM, please specify a VM that does not have VM snapshots");
+            if (vmSnapshots.size() > 0) {
+                throw new InvalidParameterValueException("Unable to restore VM, please remove VM snapshots before restoring VM");
             }
 
             VMTemplateVO template = null;
