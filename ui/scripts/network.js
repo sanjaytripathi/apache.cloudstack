@@ -4759,11 +4759,19 @@
                                         },
                                         'startport': {
                                             edit: true,
-                                            label: 'label.start.port'
+                                            label: 'label.start.port',
+                                            validation: {
+                                                number: true,
+                                                range: [0, 65535]
+                                            }
                                         },
                                         'endport': {
                                             edit: true,
-                                            label: 'label.end.port'
+                                            label: 'label.end.port',
+                                            validation: {
+                                                number: true,
+                                                range: [0, 65535]
+                                            }
                                         },
                                         'icmptype': {
                                             edit: true,
@@ -4778,7 +4786,10 @@
                                         'cidr': {
                                             edit: true,
                                             label: 'label.cidr',
-                                            isHidden: true
+                                            isHidden: true,
+                                            validation: {
+                                                ipv4cidr: true
+                                            }
                                         },
                                         'accountname': {
                                             edit: true,
@@ -4958,11 +4969,19 @@
                                         },
                                         'startport': {
                                             edit: true,
-                                            label: 'label.start.port'
+                                            label: 'label.start.port',
+                                            validation: {
+                                                number: true,
+                                                range: [0, 65535]
+                                            }
                                         },
                                         'endport': {
                                             edit: true,
-                                            label: 'label.end.port'
+                                            label: 'label.end.port',
+                                            validation: {
+                                                number: true,
+                                                range: [0, 65535]
+                                            }
                                         },
                                         'icmptype': {
                                             edit: true,
@@ -4977,7 +4996,10 @@
                                         'cidr': {
                                             edit: true,
                                             label: 'label.cidr',
-                                            isHidden: true
+                                            isHidden: true,
+                                            validation: {
+                                                ipv4cidr: true
+                                            }
                                         },
                                         'accountname': {
                                             edit: true,
