@@ -204,22 +204,6 @@ public class XenServerStorageProcessor implements StorageProcessor {
                 vdi = hypervisorResource.mount(conn, null, null, data.getPath());
             }
 
-            /* For HVM guest, if no pv driver installed, no attach/detach */
-            boolean isHVM = vm.getPVBootloader(conn).equalsIgnoreCase("");
-
-            VMGuestMetrics vgm = vm.getGuestMetrics(conn);
-            boolean pvDrvInstalled = false;
-
-            if (!this.hypervisorResource.isRefNull(vgm) && vgm.getPVDriversUpToDate(conn)) {
-                pvDrvInstalled = true;
-            }
-
-            if (isHVM && !pvDrvInstalled) {
-                s_logger.warn(": You attempted an operation on a VM which requires PV drivers to be installed but the drivers were not detected");
-
-                return new AttachAnswer("You attempted an operation that requires PV drivers to be installed on the VM. Please install them by inserting xen-pv-drv.iso.");
-            }
-
             // Figure out the disk number to attach the VM to
             String diskNumber = null;
             Long deviceId = disk.getDiskSeq();
@@ -367,21 +351,6 @@ public class XenServerStorageProcessor implements StorageProcessor {
             }
 
             if (!vmNotRunning) {
-                /* For HVM guest, if no pv driver installed, no attach/detach */
-                boolean isHVM = vm.getPVBootloader(conn).equalsIgnoreCase("");
-
-                VMGuestMetrics vgm = vm.getGuestMetrics(conn);
-                boolean pvDrvInstalled = false;
-
-                if (!this.hypervisorResource.isRefNull(vgm) && vgm.getPVDriversUpToDate(conn)) {
-                    pvDrvInstalled = true;
-                }
-
-                if (isHVM && !pvDrvInstalled) {
-                    s_logger.warn(": You attempted an operation on a VM which requires PV drivers to be installed but the drivers were not detected");
-                    return new DettachAnswer("You attempted an operation that requires PV drivers to be installed on the VM. Please install them by inserting xen-pv-drv.iso.");
-                }
-
                 VDI vdi = this.hypervisorResource.mount(conn, null, null, data.getPath());
 
                 // Look up all VBDs for this VDI
