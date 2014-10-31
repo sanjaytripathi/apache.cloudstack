@@ -1970,8 +1970,7 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
             vmInternalCSName = vmSpec.getName();
             if (_instanceNameFlag == true) {
                 String[] tokens = vmInternalCSName.split("-");
-                assert (tokens.length >= 3); // vmInternalCSName has format i-x-y-<instance.name>
-                vmNameOnVcenter = String.format("%s-%s-%s-%s", tokens[0], tokens[1], tokens[2], vmSpec.getHostName());
+                vmNameOnVcenter = String.format("%s-%s-%s", tokens[0], tokens[1], vmSpec.getHostName());
             }
             else
                 vmNameOnVcenter = vmSpec.getName();
