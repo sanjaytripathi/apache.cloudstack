@@ -758,3 +758,5 @@ CREATE TABLE `cloud`.`baremetal_rct` (
   `rct` text NOT NULL,
    PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
+
+UPDATE `cloud`.`host` SET resource = REPLACE(resource, 'com.cloud.hypervisor.xen.resource', 'com.cloud.hypervisor.xenserver.resource') WHERE hypervisor_type='XenServer' AND REMOVED IS NULL;
