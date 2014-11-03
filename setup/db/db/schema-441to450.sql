@@ -760,3 +760,5 @@ CREATE TABLE `cloud`.`baremetal_rct` (
 ) ENGINE = InnoDB DEFAULT CHARSET=utf8;
 
 UPDATE `cloud`.`host` SET resource = REPLACE(resource, 'com.cloud.hypervisor.xen.resource', 'com.cloud.hypervisor.xenserver.resource') WHERE hypervisor_type='XenServer' AND REMOVED IS NULL;
+
+ALTER TABLE `cloud_usage`.`usage_vpn_user` CHANGE `user_name` `user_name` VARCHAR(255);
