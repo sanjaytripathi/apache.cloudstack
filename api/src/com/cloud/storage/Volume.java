@@ -70,7 +70,6 @@ public interface Volume extends ControlledEntity, Identity, InternalIdentity, Ba
             s_fsm.addTransition(new StateMachine2.Transition<State, Event>(Creating, Event.OperationRetry, Creating, null));
             s_fsm.addTransition(new StateMachine2.Transition<State, Event>(Creating, Event.OperationFailed, Allocated, null));
             s_fsm.addTransition(new StateMachine2.Transition<State, Event>(Creating, Event.OperationSucceeded, Ready, null));
-            s_fsm.addTransition(new StateMachine2.Transition<State, Event>(Creating, Event.DestroyRequested, Destroy, null));
             s_fsm.addTransition(new StateMachine2.Transition<State, Event>(Creating, Event.CreateRequested, Creating, null));
             s_fsm.addTransition(new StateMachine2.Transition<State, Event>(Ready, Event.ResizeRequested, Resizing, null));
             s_fsm.addTransition(new StateMachine2.Transition<State, Event>(Resizing, Event.OperationSucceeded, Ready, Arrays.asList(new StateMachine2.Transition.Impact[]{StateMachine2.Transition.Impact.USAGE})));
