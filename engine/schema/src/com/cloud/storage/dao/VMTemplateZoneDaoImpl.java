@@ -16,10 +16,14 @@
 // under the License.
 package com.cloud.storage.dao;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.ejb.Local;
 
+import com.cloud.utils.DateUtil;
+import com.cloud.utils.exception.CloudRuntimeException;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
@@ -93,7 +97,24 @@ public class VMTemplateZoneDaoImpl extends GenericDaoBase<VMTemplateZoneVO, Long
         txn.start();
         remove(sc);
         txn.commit();
+    }
 
+    @Override
+    public void updateAndSetRemovedToNull(VMTemplateZoneVO tmplzoneref) {
+        TransactionLegacy txn = TransactionLegacy.currentTxn();
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = txn.prepareAutoCloseStatement("update `cloud`.`template_zone_ref` set removed=?, last_updated=? where id=?");
+            pstmt.setObject(1, null);
+            pstmt.setString(2, DateUtil.getDateDisplayString(s_gmtTimeZone, new java.util.Date()));
+            pstmt.setLong(3, tmplzoneref.getId());
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new CloudRuntimeException("DB Exception on: " , e);
+        } catch (Throwable e) {
+            throw new CloudRuntimeException("Caught: ", e);
+        }
     }
 
 }

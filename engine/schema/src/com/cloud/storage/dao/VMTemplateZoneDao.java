@@ -32,4 +32,5 @@ public interface VMTemplateZoneDao extends GenericDao<VMTemplateZoneVO, Long> {
 
     public void deletePrimaryRecordsForTemplate(long templateId);
 
+    void updateAndSetRemovedToNull(VMTemplateZoneVO tmplzoneref);
 }
