@@ -26,6 +26,11 @@ function install_vhd_util() {
   chmod a+x /bin/vhd-util
 }
 
+function fix_irqbalance() {
+  wget --no-check-certificate http://download.cloud.com.s3.amazonaws.com/tools/irqbalance -O /usr/sbin/irqbalance
+  chmod a+x /usr/sbin/irqbalance
+}
+
 function debconf_packages() {
   echo 'sysstat sysstat/enable boolean true' | debconf-set-selections
   echo "openswan openswan/install_x509_certificate boolean false" | debconf-set-selections
@@ -41,7 +46,6 @@ function install_packages() {
 
   debconf_packages
   install_vhd_util
-
   local apt_install="apt-get --no-install-recommends -q -y --force-yes install"
 
   #32 bit architecture support:: not required for 32 bit template
@@ -75,6 +79,8 @@ function install_packages() {
     radvd \
     sharutils
 
+  fix_irqbalance
+  
   # commented out installation of vmware-tools as we are using the open source open-vm-tools:
   # ${apt_install} build-essential linux-headers-`uname -r`
   # df -h
