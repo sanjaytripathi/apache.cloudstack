@@ -104,5 +104,36 @@
                 }
             });
         });
+
+        // Add KVM agent version and Qemu version to host details page
+        $(window).bind('cloudStack.detailView.makeFieldContent', function(e, args) {
+            var fields = args.fields;
+            var sectionID = args.$detailView.data('list-view') ?
+                args.$detailView.data('list-view').data('view-args').activeSection : null;
+            var data = args.data; // JSON data to be loaded in detail view
+
+            if (!$.isArray(fields) || sectionID != "hosts" || !data.details) return;
+
+            var hostdetails = {};
+            if (data.details['KVM.Agent.Version'])
+            {
+                $.extend(data, {
+                    agentversion: data.details['KVM.Agent.Version']
+                });
+                $.extend(hostdetails, {
+                    agentversion: { label: 'KVM agent version' }
+                });
+            };
+            if (data.details['Qemu.Img.Version'])
+            {
+                $.extend(data, {
+                    qemuversion: data.details['Qemu.Img.Version']
+                });
+                $.extend(hostdetails, {
+                    qemuversion: { label: 'Qemu version' }
+                });
+            };
+            fields.push(hostdetails);
+        });
     };
 }(jQuery, cloudStack));
