@@ -165,7 +165,7 @@ if [ "$installtype" == "q" -o "$installtype" == "Q" ] ; then
 
 	elif [ "$installtype" == "s" -o "$installtype" == "S" ] ; then
 		echo "Installing the Usage Server..." >&2
-		doinstall cloudstack-usage cloud-premium
+		doinstall cloudstack-usage
 		true
 
 	elif [ "$installtype" == "d" -o "$installtype" == "D" ] ; then
@@ -291,7 +291,7 @@ while [ $# -gt 0 ] ; do
      ;;
   -s | --install-user)
      echo "***** Installing the Usage Server *****"
-	 doinstallauto cloudstack-usage cloud-premium
+	 doinstallauto cloudstack-usage
 	 true
      shift
      ;;
