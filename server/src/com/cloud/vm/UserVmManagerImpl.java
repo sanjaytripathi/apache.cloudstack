@@ -1721,7 +1721,10 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
     @Override
     public boolean expunge(UserVmVO vm, long callerUserId, Account caller) {
-        _vmDao.acquireInLockTable(vm.getId());
+        vm = _vmDao.acquireInLockTable(vm.getId());
+        if (vm == null) {
+            return false;
+        }
         try {
             List<VolumeVO> rootVol = _volsDao.findByInstanceAndType(vm.getId(), Volume.Type.ROOT);
             // expunge the vm
