@@ -169,7 +169,9 @@ class TestVPCDistributedRouterOffering(cloudstackTestCase):
         testClient = super(TestVPCDistributedRouterOffering, cls).getClsTestClient()
         cls.apiclient = testClient.getApiClient()
         cls.services = Services().services
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.apiclient)
         cls.zone = get_zone(cls.apiclient, testClient.getZoneForTests())

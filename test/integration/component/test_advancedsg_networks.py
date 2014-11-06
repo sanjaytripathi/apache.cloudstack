@@ -1083,7 +1083,8 @@ class TestNetworksInAdvancedSG(cloudstackTestCase):
         #  1. Try to create VPC in SG enabled advanced zone
         # Validations,
         #  1. VPC creation should fail
-
+        if self.hypervisor.lower() in ['hyperv']:
+            raise unittest.SkipTest("This feature is not supported on Hyper-v. Hence, skipping the test")
         vpc_off = VpcOffering.create(self.api_client,self.services["vpc_offering"])
         vpc_off.update(self.api_client, state='Enabled')
 

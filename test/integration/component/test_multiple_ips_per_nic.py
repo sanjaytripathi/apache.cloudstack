@@ -22,7 +22,7 @@
 
     Design Document: https://cwiki.apache.org/confluence/display/CLOUDSTACK/Multiple+IP+address+per+NIC
 """
-from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.cloudstackTestCase import *
 from marvin.lib.utils import *
 from marvin.lib.base import *
 from marvin.lib.common import *
@@ -214,6 +214,8 @@ class TestBasicOperations(cloudstackTestCase):
         # 3. Step 5 should should fail
         # 4. Step 6 should fail
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -266,7 +268,8 @@ class TestBasicOperations(cloudstackTestCase):
         # Validations:
         # 1. Step 4 should succeed
         # 2. Step 5 should fail
-
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -337,7 +340,8 @@ class TestBasicOperations(cloudstackTestCase):
         # 5. Step 8 should fail
         # 6. Step 9 should fail
 
-
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -409,6 +413,8 @@ class TestBasicOperations(cloudstackTestCase):
         # Validations:
         # 1. All the operations should be successful
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         child_domain = Domain.create(self.apiclient,services=self.services["domain"],
                                      parentdomainid=self.domain.id)
 
@@ -551,7 +557,8 @@ class TestNetworkRules(cloudstackTestCase):
         # 2. Step 5 should succeed
         # 3. Step 6 should succeed
         # 4. Step 7 should fail
-
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -602,6 +609,8 @@ class TestNetworkRules(cloudstackTestCase):
         # 1. Step 5 should fail
         # 2. Step 6 should succeed
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -667,6 +676,8 @@ class TestNetworkRules(cloudstackTestCase):
         # Validations:
         # 1. Step 5 should succeed
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -727,6 +738,8 @@ class TestNetworkRules(cloudstackTestCase):
         # 4. Step 7 should fail
         # 5. Step 8 should succeed
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -781,6 +794,8 @@ class TestNetworkRules(cloudstackTestCase):
         # Validations:
         # 1. Verify step 5 by listing seconday IP and checking the appropriate flag
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -920,6 +935,8 @@ class TestVmNetworkOperations(cloudstackTestCase):
         # 7. Verify that nat rule does not exist and static nat is not enabled for
         #    secondary IP
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -1001,6 +1018,8 @@ class TestVmNetworkOperations(cloudstackTestCase):
         # 6. Destroy the virtual machine and recover it
         # 7. Verify that nat and static nat rules exist
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -1078,6 +1097,8 @@ class TestVmNetworkOperations(cloudstackTestCase):
         # 6. Restart the network with cleanup option True
         # 7. Verify that nat and static nat rules exist after network restart
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -1142,6 +1163,8 @@ class TestVmNetworkOperations(cloudstackTestCase):
         # 6. Restart the network with cleanup option False
         # 7. Verify that nat and static nat rules exist after network restart
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 
@@ -1206,6 +1229,8 @@ class TestVmNetworkOperations(cloudstackTestCase):
         # 6. Reboot router VM
         # 7. Verify that nat and static nat rules exist after router restart
 
+        if value == VPC_NETWORK and self.testClient.getHypervisorInfo().lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         self.account = Account.create(self.apiclient,self.services["account"],domainid=self.domain.id)
         self.cleanup.append(self.account)
 

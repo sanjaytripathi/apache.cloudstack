@@ -431,7 +431,8 @@ class TestAddNetworkToVirtualMachine(cloudstackTestCase):
 
         # Validate the following:
         # 1. Adding VPC to vm should fail
-
+        if self.hypervisor.lower() in ['hyperv']:
+            raise unittest.SkipTest("This feature is not supported on Hyper-v. Hence, skipping the test")
         try:
             virtual_machine = VirtualMachine.create(
                 self.api_client, self.services["virtual_machine"],
@@ -470,7 +471,6 @@ class TestAddNetworkToVirtualMachine(cloudstackTestCase):
     @data("isolated")
     def test_05_add_vpc_nw_stopped_vm(self, value):
         """Add VPC network to stopped VM belonging to isolated network"""
-
         # 1. Deploy VM in an account
         # 2. Stop the VM
         # 3. Add isolated network to the VM
@@ -479,7 +479,8 @@ class TestAddNetworkToVirtualMachine(cloudstackTestCase):
 
         # Validate the following:
         # 1. Adding VPC to vm should fail
-
+        if self.hypervisor.lower() in ['hyperv']:
+            raise unittest.SkipTest("This feature is not supported on Hyper-v. Hence, skipping the test")
         try:
             self.virtual_machine.stop(self.apiclient)
         except Exception as e:

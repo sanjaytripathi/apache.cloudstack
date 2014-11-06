@@ -215,7 +215,9 @@ class TestVMLifeCycleVPC(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleVPC, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
@@ -874,8 +876,10 @@ class TestVMLifeCycleSharedNwVPC(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleSharedNwVPC, cls).getClsTestClient()
-	cls.api_client = cls.testClient.getApiClient()
-
+        cls.api_client = cls.testClient.getApiClient()
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
@@ -1642,8 +1646,10 @@ class TestVMLifeCycleBothIsolated(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleBothIsolated, cls).getClsTestClient()
-	cls.api_client = cls.testClient.getApiClient()
-
+        cls.api_client = cls.testClient.getApiClient()
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
@@ -1976,8 +1982,10 @@ class TestVMLifeCycleStoppedVPCVR(cloudstackTestCase):
     @classmethod
     def setUpClass(cls):
         cls.testClient = super(TestVMLifeCycleStoppedVPCVR, cls).getClsTestClient()
-	cls.api_client = cls.testClient.getApiClient()
-
+        cls.api_client = cls.testClient.getApiClient()
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
@@ -2662,7 +2670,9 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
             cls.testClient = super(TestVMLifeCycleDiffHosts, cls).getClsTestClient()
             cls.api_client = cls.testClient.getApiClient()
-
+            cls.hypervisor = cls.testClient.getHypervisorInfo()
+            if cls.hypervisor.lower() == 'hyperv':
+                raise unittest.SkipTest("VPC is not supported on Hyper-V")
             cls.services = Services().services
             # Get Zone, Domain and templates
             cls.domain = get_domain(cls.api_client)
@@ -3056,7 +3066,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
 
         return
 
-    @attr(tags=["advanced","multihost", "intervlan"])
+    @attr(tags=["advanced","multihost", "intervlan"], required_hardware="true")
     def test_01_deploy_instance_in_network(self):
         """ Test deploy an instance in VPC networks
         """
@@ -3090,7 +3100,7 @@ class TestVMLifeCycleDiffHosts(cloudstackTestCase):
                              )
         return
 
-    @attr(tags=["advanced","multihost", "intervlan"])
+    @attr(tags=["advanced","multihost", "intervlan"], required_hardware="true")
     def test_02_stop_instance_in_network(self):
         """ Test stop an instance in VPC networks
         """

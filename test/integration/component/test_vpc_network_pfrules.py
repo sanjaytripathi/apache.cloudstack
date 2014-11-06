@@ -184,7 +184,9 @@ class TestVPCNetworkPFRules(cloudstackTestCase):
 
         cls.testClient = super(TestVPCNetworkPFRules, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)

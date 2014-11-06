@@ -2329,7 +2329,9 @@ class TestVPCNetworkOperations(cloudstackTestCase):
             TestVPCNetworkOperations,
             cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         # Fill services from the external config file
         cls.services = cls.testClient.getParsedTestDataConfig()
 

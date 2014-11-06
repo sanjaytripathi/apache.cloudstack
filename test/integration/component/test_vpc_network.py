@@ -241,7 +241,9 @@ class TestVPCNetwork(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetwork, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
 
         # Added an attribute to track if Netscaler addition was successful.
@@ -1004,7 +1006,9 @@ class TestVPCNetworkRanges(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetworkRanges, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
 
         # Added an attribute to track if Netscaler addition was successful.
@@ -1542,7 +1546,9 @@ class TestVPCNetworkUpgrade(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetworkUpgrade, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
 
         # Get Zone, Domain and templates
@@ -1934,7 +1940,7 @@ class TestVPCNetworkUpgrade(cloudstackTestCase):
         # When all Vms ain network are stopped, network state changes from Implemented --> Shutdown --> Allocated
         # We can't update the network when it is in Shutodown state, hence we should wait for the state to change to
         # Allocated and then update the network
-        retriesCount = 20
+        retriesCount = 10
         while True:
             networks = list_networks(self.apiclient, id=network_1.id)
             self.assertEqual(validateList(networks)[0], PASS, "networks list validation failed, list id %s" % networks)
@@ -2119,7 +2125,9 @@ class TestVPCNetworkGc(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestVPCNetworkGc, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() == 'hyperv':
+            raise unittest.SkipTest("VPC is not supported on Hyper-V")
         cls.services = Services().services
 
         # Get Zone, Domain and templates
