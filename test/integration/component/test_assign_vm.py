@@ -19,7 +19,7 @@
 """
 #Import Local Modules
 from nose.plugins.attrib           import attr
-from marvin.cloudstackTestCase     import cloudstackTestCase
+from marvin.cloudstackTestCase     import *
 from marvin.lib.base   import (Account,
                                            Domain,
                                            User,
@@ -100,7 +100,7 @@ class TestVMOwnership(cloudstackTestCase):
         cls._cleanup = []
         cls.testClient = super(TestVMOwnership, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
@@ -416,6 +416,8 @@ class TestVMOwnership(cloudstackTestCase):
         # Validate the following:
         # 1. deploy VM in sub subdomain1 with snapshot.
         # 3. assignVirtualMachine to subdomain2
+        if self.hypervisor.lower() in ['hyperv']:
+            raise unittest.skipTest("Snapshots feature is not supported on Hyper-V")
         self.create_vm(self.sdomain_account_user1['account'], self.sdomain_account_user1['domain'], snapshot=True)
         self.virtual_machine.assign_virtual_machine(self.apiclient, self.sdomain_account_user2['account'].name ,self.sdomain_account_user2['domain'].id)
         snapshots = list_snapshots(self.apiclient,
@@ -446,6 +448,8 @@ class TestVMOwnership(cloudstackTestCase):
         # Validate the following:
         # 1. deploy VM in sub subdomain1 when account limit is reached.
         # 3. assignVirtualMachine to subdomain2
+        if self.hypervisor.lower() in ['hyperv']:
+            raise unittest.skipTest("Snapshots feature is not supported on Hyper-V")
         update_resource_limit(self.apiclient,
                               0, # VM Instances
                               account=self.sdomain_account_user2['account'].name,
@@ -465,6 +469,8 @@ class TestVMOwnership(cloudstackTestCase):
         # Validate the following:
         # 1. deploy VM in sub subdomain1 when account limit is reached.
         # 3. assignVirtualMachine to subdomain2
+        if self.hypervisor.lower() in ['hyperv']:
+            raise unittest.skipTest("Snapshots feature is not supported on Hyper-V")
         update_resource_limit(
                               self.apiclient,
                               0, # VM Instances

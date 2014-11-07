@@ -29,7 +29,7 @@ from marvin.codes import (PASS,
                           FAIL,
                           RECURRING)
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import cloudstackTestCase
+from marvin.cloudstackTestCase import *
 
 from marvin.lib.base import (ServiceOffering,
                                          Account,
@@ -163,7 +163,7 @@ class TestBaseImageUpdate(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestBaseImageUpdate, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
@@ -529,6 +529,8 @@ class TestBaseImageUpdate(cloudstackTestCase):
         1) New root disk should be formed
         2) The recurring snapshot rule should be deleted
         """
+        if self.hypervisor.lower() in ['hyperv']:
+            raise unittest.skipTest("Snapshots feature is not supported on Hyper-V")
         vms = VirtualMachine.list(
                                   self.apiclient,
                                   id=self.vm_with_reset.id,

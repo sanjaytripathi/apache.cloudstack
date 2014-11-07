@@ -46,6 +46,9 @@ class TestSnapshotList(cloudstackTestCase):
 	"""
         cls.testclient = super(TestSnapshotList, cls).getClsTestClient()
         cls.apiclient = cls.testclient.getApiClient()
+        cls.hypervisor = cls.testclient.getHypervisorInfo()
+        if cls.hypervisor.lower() in ['hyperv']:
+            raise unittest.SkipTest("Snapshots feature is not supported on Hyper-V")
         cls.testdata = cls.testClient.getParsedTestDataConfig()
         cls.acldata = cls.testdata["acl"]
 

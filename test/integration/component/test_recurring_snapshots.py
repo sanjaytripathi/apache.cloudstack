@@ -128,7 +128,9 @@ class TestRecurringSnapshots(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestRecurringSnapshots, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() in ['hyperv']:
+            raise unittest.SkipTest("Snapshots feature is not supported on Hyper-V")
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)

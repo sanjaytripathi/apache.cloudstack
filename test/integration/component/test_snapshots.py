@@ -18,7 +18,7 @@
 """
 #Import Local Modules
 from nose.plugins.attrib import             attr
-from marvin.cloudstackTestCase import       cloudstackTestCase
+from marvin.cloudstackTestCase import *
 
 from marvin.lib.base import     (Snapshot,
                                              Template,
@@ -160,7 +160,9 @@ class TestSnapshots(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestSnapshots, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-
+        cls.hypervisor = cls.testClient.getHypervisorInfo()
+        if cls.hypervisor.lower() in ['hyperv']:
+            raise unittest.SkipTest("Snapshots feature is not supported on Hyper-V")
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
