@@ -64,7 +64,7 @@ function doremove() {
 set +e
 [ `whoami` != 'root' ] && echo "This script must run as root" && exit 1
 uname -a | grep 'x86_64' >/dev/null
-[ "$?" -ne 0 ] && echo "CloudStack only supports x86_64 platform now" && exit 1
+[ "$?" -ne 0 ] && echo "CloudPlatform only supports x86_64 platform now" && exit 1
 set -e
 
 trap "cleanup" INT TERM EXIT
@@ -89,7 +89,7 @@ unset removedb
 unset upgrade
 unset remove
 
-if installed cloudstack-management || installed cloudstack-agent || installed cloudstack-usage || installed cloudstack-baremetal-agent; then
+if installed cloudstack-management || installed cloudstack-agent || installed cloudstack-usage || installed cloudstack-baremetal-agent || installed cloud-client || installed cloud-agent || installed cloud-usage || installed cloud-baremetal-agent; then
     upgrade="    U) Upgrade the CloudPlatform packages installed on this computer
 "
     remove="    R) Stop any running CloudPlatform services and remove the CloudPlatform packages from this computer
@@ -125,7 +125,7 @@ if [ $# -lt 1 ] ; then
 
 setuprepo
 
-	read -p "Welcome to the CloudStack Installer.  What would you like to do?
+	read -p "Welcome to the CloudPlatform Installer.  What would you like to do?
 
 	NOTE:	For installing KVM agent, please setup EPEL<http://fedoraproject.org/wiki/EPEL> yum repo first;
 		For installing CloudPlatform on RHEL6.x, please setup distribution yum repo either from ISO or from your registeration account.
@@ -232,7 +232,7 @@ function commonRemoval () {
 		echo "***** Removing all CloudPlatform packages on this machine *****"
 		doremove 'cloud-*'
 		else
-			echo "CloudStack is not installed on this machine" 
+			echo "CloudPlatform is not installed on this machine" 
 		fi
 	fi
 
