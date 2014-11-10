@@ -1397,6 +1397,7 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
         }
 
         VirtualMachineTO vmSpec = cmd.getVirtualMachine();
+        boolean vmAlreadyExistsInVcenter = false;
 
         Pair<String, String> names = composeVmNames(vmSpec);
         String vmInternalCSName = names.first();
@@ -1430,6 +1431,17 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
             VmwareManager mgr = context.getStockObject(VmwareManager.CONTEXT_STOCK_NAME);
 
             VmwareHypervisorHost hyperHost = getHyperHost(context);
+            DatacenterMO dcMo = new DatacenterMO(hyperHost.getContext(), hyperHost.getHyperHostDatacenter());
+
+            // Validate VM name is unique in Datacenter
+            VirtualMachineMO vmInVcenter = dcMo.checkIfVmAlreadyExistsInVcenter(vmNameOnVcenter, vmInternalCSName);
+            if(vmInVcenter != null) {
+                vmAlreadyExistsInVcenter = true;
+                String msg = "VM with name: " + vmNameOnVcenter +" already exists in vCenter.";
+                s_logger.error(msg);
+                throw new Exception(msg);
+            }
+
             DiskTO[] disks = validateDisks(vmSpec.getDisks());
             assert (disks.length > 0);
             NicTO[] nics = vmSpec.getNics();
@@ -1448,7 +1460,6 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
                 throw new Exception(msg);
             }
 
-            DatacenterMO dcMo = new DatacenterMO(hyperHost.getContext(), hyperHost.getHyperHostDatacenter());
             VirtualMachineDiskInfoBuilder diskInfoBuilder = null;
             VirtualMachineMO vmMo = hyperHost.findVmOnHyperHost(vmInternalCSName);
             DiskControllerType systemVmScsiControllerType = DiskControllerType.lsilogic;
@@ -1870,7 +1881,11 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
 
             String msg = "StartCommand failed due to " + VmwareHelper.getExceptionMessage(e);
             s_logger.warn(msg, e);
-            return new StartAnswer(cmd, msg);
+            StartAnswer startAnswer = new StartAnswer(cmd, msg);
+            if(vmAlreadyExistsInVcenter) {
+                startAnswer.setContextParam("stopRetry", "true");
+            }
+            return startAnswer;
         } finally {
         }
     }
