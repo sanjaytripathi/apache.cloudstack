@@ -233,7 +233,7 @@ public final class RawHTTP {
     private SSLContext getClientSSLContext() {
         SSLContext sslContext = null;
         try {
-            sslContext = SSLContext.getInstance("SSL", "SunJSSE");
+            sslContext = SSLContext.getInstance("TLS", "SunJSSE");
         } catch (NoSuchAlgorithmException e) {
             s_logger.error("Unexpected exception ", e);
         } catch (NoSuchProviderException e) {
