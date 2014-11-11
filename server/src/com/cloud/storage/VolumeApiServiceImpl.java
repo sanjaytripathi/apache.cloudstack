@@ -921,6 +921,9 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     if (jobResult instanceof ConcurrentOperationException) {
                         throw (ConcurrentOperationException)jobResult;
                     }
+                    else if (jobResult instanceof ResourceAllocationException) {
+                        throw (ResourceAllocationException)jobResult;
+                    }
                     else if (jobResult instanceof RuntimeException) {
                         throw (RuntimeException)jobResult;
                     }
