@@ -79,7 +79,9 @@
 
             // Replace 'CloudStack' -> 'CloudPlatform'
             cloudStack.localizationFn = function(str) {
-                return dictionary[str] ? replace(dictionary[str]) : str;
+                // look in dictionary first; if not found, try dictionary2
+                var localized = dictionary[str] ? dictionary[str] : dictionary2[str];
+                return localized ? replace(localized) : str; 
             };
 
             // Remove unsupported languages
