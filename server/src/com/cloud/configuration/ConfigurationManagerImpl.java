@@ -1959,10 +1959,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         DomainVO domainVO = null;
 
-        if (userId == null) {
-            userId = User.UID_SYSTEM;
-        }
-
         if (domainId != null) {
             domainVO = _domainDao.findById(domainId);
         }
