@@ -5370,10 +5370,8 @@
                                     },
                                     networkdomain: {
                                         docID: 'helpVPCDomain',
-                                        label: 'label.DNS.domain.for.guest.networks',
-                                        validation: {
-                                            ipv4: true
-                                        }
+                                        label: 'label.DNS.domain.for.guest.networks'
+                                        //format: FQDN
                                     },
                                     publicLoadBalancerProvider: {
                                         label: 'label.public.load.balancer.provider',
