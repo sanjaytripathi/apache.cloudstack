@@ -1925,7 +1925,12 @@
                                         else
                                             jsonObj.xenserverToolsVersion61plus = false;
                                     }
-                                                                   
+                                                                           
+                                    $(window).trigger('cloudStack.module.sharedFunctions.addExtraProperties', {
+                                    	obj: jsonObj,
+                                    	objType: "UserVM"
+                                    });
+                                                                       
                                     args.response.success({
                                         actionFilter: vmActionfilter,
                                         data: jsonObj
