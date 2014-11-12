@@ -186,6 +186,19 @@ public class LdapUserManager {
         return searchUsers(null, context);
     }
 
+    private boolean isUserDisabledInAD(SearchResult result) throws NamingException {
+        boolean isDisabledUser = false;
+        String userAccountControl = LdapUtils.getAttributeValue(result.getAttributes(), _ldapConfiguration.getUserAccountControlAttribute());
+        if (userAccountControl != null) {
+            int control = Integer.valueOf(userAccountControl);
+            // second bit represents disabled user flag in AD
+            if ((control & 2) > 0) {
+                isDisabledUser = true;
+            }
+        }
+        return isDisabledUser;
+    }
+
     public List<LdapUser> searchUsers(final String username, final LdapContext context) throws NamingException, IOException {
 
         final SearchControls searchControls = new SearchControls();
@@ -206,7 +219,9 @@ public class LdapUserManager {
             results = context.search(basedn, generateSearchFilter(username), searchControls);
             while (results.hasMoreElements()) {
                 final SearchResult result = results.nextElement();
-                users.add(createUser(result));
+                if (!isUserDisabledInAD(result)) {
+                    users.add(createUser(result));
+                }
             }
             Control[] contextControls = context.getResponseControls();
             if (contextControls != null) {
