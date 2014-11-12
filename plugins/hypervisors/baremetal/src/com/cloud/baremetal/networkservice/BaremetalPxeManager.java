@@ -61,6 +61,6 @@ public interface BaremetalPxeManager extends Manager, PluggableService {
     public static final Network.Service BAREMETAL_PXE_SERVICE = new Network.Service("BaremetalPxeService");
     public static final String BAREMETAL_PXE_CAPABILITY = "BaremetalPxe";
     public static final String BAREMETAL_PXE_SERVICE_PROPERTIES = "baremetalpxe_commands.properties";
-    public static final Provider BAREMETAL_PXE_SERVICE_PROVIDER = new Provider("BaremetalPxeProvider", true);;
+    public static final Provider BAREMETAL_PXE_SERVICE_PROVIDER = new Provider("BaremetalPxeProvider", false);
     public static final Provider BAREMETAL_USERDATA_PROVIDER = new Provider("BaremetalUserdataProvider", true);
 }
