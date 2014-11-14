@@ -37,6 +37,7 @@ import org.apache.log4j.Logger;
 import com.cloud.agent.Listener;
 import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.CheckHealthCommand;
+import com.cloud.agent.api.CheckOnHostCommand;
 import com.cloud.agent.api.CheckNetworkCommand;
 import com.cloud.agent.api.CheckVirtualMachineCommand;
 import com.cloud.agent.api.CleanupNetworkRulesCmd;
@@ -111,7 +112,8 @@ public abstract class AgentAttache {
     public final static String[] s_commandsAllowedInMaintenanceMode = new String[] {MaintainCommand.class.toString(), MigrateCommand.class.toString(),
         StopCommand.class.toString(), CheckVirtualMachineCommand.class.toString(), PingTestCommand.class.toString(), CheckHealthCommand.class.toString(),
         ReadyCommand.class.toString(), ShutdownCommand.class.toString(), SetupCommand.class.toString(),
-        CleanupNetworkRulesCmd.class.toString(), CheckNetworkCommand.class.toString(), PvlanSetupCommand.class.toString()};
+        CleanupNetworkRulesCmd.class.toString(), CheckNetworkCommand.class.toString(), PvlanSetupCommand.class.toString(),
+        CheckOnHostCommand.class.toString()};
     protected final static String[] s_commandsNotAllowedInConnectingMode = new String[] {StartCommand.class.toString(), CreateCommand.class.toString()};
     static {
         Arrays.sort(s_commandsAllowedInMaintenanceMode);
