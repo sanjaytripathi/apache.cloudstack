@@ -77,6 +77,8 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
 
     private String name;
 
+    private String sslProtocol = "TLSv1"; //The default SSL Protocol will be this if we do not set any property. Because of POODLE vulnerability default is TLSv1.
+
     private static Integer retryInterval;
 
     // hashmap to book keep the registered subscribers
@@ -87,6 +89,8 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
 
     // AMQP server should consider messages acknowledged once delivered if _autoAck is true
     private static boolean s_autoAck = true;
+
+
 
     private ExecutorService executorService;
     private static DisconnectHandler disconnectHandler;
@@ -373,7 +377,7 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
             }
 
             if (useSsl != null && !useSsl.isEmpty() && useSsl.equalsIgnoreCase("true")) {
-                factory.useSslProtocol();
+                factory.useSslProtocol(sslProtocol);
             }
             Connection connection = factory.newConnection();
             connection.addShutdownListener(disconnectHandler);
@@ -597,5 +601,9 @@ public class RabbitMQEventBus extends ManagerBase implements EventBus {
             }
             return;
         }
+    }
+
+    public void setSslProtocol(String sslProtocol) {
+      this.sslProtocol = sslProtocol;
     }
 }
