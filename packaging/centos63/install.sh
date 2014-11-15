@@ -155,7 +155,8 @@ if [ "$installtype" == "q" -o "$installtype" == "Q" ] ; then
                         fi
 			echo "Agent installation is completed, please add the host from management server" >&2
 		else
-			true
+			echo "Agent installation failed" >&2
+                        exit 1
 		fi
 		
 	elif [ "$installtype" == "b" -o "$installtype" == "B" ] ; then
@@ -279,6 +280,7 @@ while [ $# -gt 0 ] ; do
                         fi
 			echo "Agent installation is completed, please add the host from management server" >&2
 		else
+			echo "Agent installation failed" >&2
 			true
 		fi	
 	shift
