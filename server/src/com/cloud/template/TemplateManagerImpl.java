@@ -1756,7 +1756,11 @@ public class TemplateManagerImpl extends ManagerBase implements TemplateManager,
             throw ex;
         }
 
-        verifyTemplateId(id);
+        // don't allow updating fields of system template except sort_key
+        if (name != null || displayText != null || format != null || guestOSId != null || passwordEnabled != null &&
+                isDynamicallyScalable != null || isRoutingTemplate != null || bootable != null) {
+            verifyTemplateId(id);
+        }
 
         // do a permission check
         _accountMgr.checkAccess(account, AccessType.OperateEntry, true, template);
