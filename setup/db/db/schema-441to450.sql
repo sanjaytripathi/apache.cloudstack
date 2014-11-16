@@ -758,7 +758,3 @@ UPDATE `cloud`.`host` SET resource = REPLACE(resource, 'com.cloud.hypervisor.xen
 ALTER TABLE `cloud_usage`.`usage_vpn_user` CHANGE `user_name` `user_name` VARCHAR(255);
 --Remove duplicates from guest_os_hypervisor table
 DELETE t1 FROM guest_os_hypervisor t1, guest_os_hypervisor t2 WHERE (t1.hypervisor_type = t2.hypervisor_type AND t1.hypervisor_version = t2.hypervisor_version AND t1.guest_os_id = t2.guest_os_id AND t1.id > t2.id AND t1.is_user_defined=0);
-
---Increase key value size generated from RSA-8192 to be stored.
-ALTER TABLE `cloud`.`user_vm_details` MODIFY `value` VARCHAR(5120);
-
