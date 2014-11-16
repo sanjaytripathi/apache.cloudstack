@@ -46,6 +46,4 @@ public interface VolumeDataStoreDao extends GenericDao<VolumeDataStoreVO, Long>,
     List<VolumeDataStoreVO> listVolumeDownloadUrls();
 
     void expireDnldUrlsForZone(Long dcId);
-
-    List<VolumeDataStoreVO> listUploadedVolumesByStoreId(long id);
 }
