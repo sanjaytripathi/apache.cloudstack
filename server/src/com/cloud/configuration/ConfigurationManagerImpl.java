@@ -38,7 +38,6 @@ import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
 import org.apache.log4j.Logger;
-
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupService;
@@ -3725,10 +3724,6 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
 
         if (availability == null) {
             throw new InvalidParameterValueException("Invalid value for Availability. Supported types: " + Availability.Required + ", " + Availability.Optional);
-        }
-
-        if (networkRate != null && networkRate < 0) {
-            networkRate = 0;
         }
 
         Long serviceOfferingId = cmd.getServiceOfferingId();
