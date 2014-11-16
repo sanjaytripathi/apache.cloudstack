@@ -4465,7 +4465,7 @@ VirtualMachineGuru, Listener, Configurable, StateListener<State, VirtualMachine.
       State oldState = transition.getCurrentState();
       State newState = transition.getToState();
       VirtualMachine.Event event = transition.getEvent();
-      if (event == VirtualMachine.Event.FollowAgentPowerOnReport && newState == State.Running) {
+      if (oldState == State.Stopped && event == VirtualMachine.Event.FollowAgentPowerOnReport && newState == State.Running) {
         if (vo.getType() == VirtualMachine.Type.DomainRouter) {
           s_logger.info("Schedule a router reboot task as router " + vo.getId() + " is powered-on out-of-band. we need to reboot to refresh network rules");
           _executor.schedule(new RebootTask(vo.getId()), 1000, TimeUnit.MICROSECONDS);
