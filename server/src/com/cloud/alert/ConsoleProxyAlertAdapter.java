@@ -53,8 +53,7 @@ public class ConsoleProxyAlertAdapter extends AdapterBase implements AlertAdapte
 
         DataCenterVO dc = _dcDao.findById(args.getZoneId());
         ConsoleProxyVO proxy = args.getProxy();
-        //FIXME - Proxy can be null in case of creation failure. Have a better fix than checking for != 0
-        if (proxy == null && args.getProxyId() != 0)
+        if (proxy == null)
             proxy = _consoleProxyDao.findById(args.getProxyId());
 
         switch (args.getType()) {
@@ -99,9 +98,12 @@ public class ConsoleProxyAlertAdapter extends AdapterBase implements AlertAdapte
 
             case ConsoleProxyAlertEventArgs.PROXY_CREATE_FAILURE:
                 if (s_logger.isDebugEnabled())
-                    s_logger.debug("Console proxy creation failure, zone: " + dc.getName());
-                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_CONSOLE_PROXY, args.getZoneId(), null,
-                    "Console proxy creation failure. zone: " + dc.getName() + ", error details: " + args.getMessage(),
+                    s_logger.debug("Console proxy creation failure, zone: " + dc.getName() + ", proxy: " + proxy.getHostName() + ", public IP: " +
+                        proxy.getPublicIpAddress() + ", private IP: " + (proxy.getPrivateIpAddress() == null ? "N/A" : proxy.getPrivateIpAddress()));
+
+                _alertMgr.sendAlert(AlertManager.AlertType.ALERT_TYPE_CONSOLE_PROXY, args.getZoneId(), proxy.getPodIdToDeployIn(),
+                    "Console proxy creation failure. zone: " + dc.getName() + ", proxy: " + proxy.getHostName() + ", public IP: " + proxy.getPublicIpAddress() +
+                        ", private IP: " + (proxy.getPrivateIpAddress() == null ? "N/A" : proxy.getPrivateIpAddress()) + ", error details: " + args.getMessage(),
                     "Console proxy creation failure (zone " + dc.getName() + ")");
                 break;
 
