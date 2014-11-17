@@ -8,6 +8,9 @@ VERSION = "0.5"
 PRODUCT_NAME = "Citrix CloudPlatform"
 RPM_NAME = "cloudstack-management"
 
+""" as of now we can only decrypt db pass for file type encType """
+db_dict = {}
+
 class CloudStackVersion:
     """ we need a way to know version of CloudPlatform we are on now 
         this is because some components change location between
@@ -119,6 +122,7 @@ def addManifestFile(p_argv, p_tmp_dir):
     elName = docManifiest.createElement("name")
     elHostname = docManifiest.createElement("hostname")
     elUuid = docManifiest.createElement("uuid")
+    elNodeId = docManifiest.createElement("nodeid")
     elVersion = docManifiest.createElement("version")
     elTaken = docManifiest.createElement("taken")
     elUser = docManifiest.createElement("user")
@@ -130,7 +134,8 @@ def addManifestFile(p_argv, p_tmp_dir):
     txtVersion = docManifiest.createTextNode(VERSION)
     txtTaken = docManifiest.createTextNode(str_date)
     txtHostname = docManifiest.createTextNode(my_hostname)
-    txtUuid = docManifiest.createTextNode(get_or_create_uuid())
+    txtUuid = docManifiest.createTextNode(get_uuid())
+    txtNodeId = docManifiest.createTextNode(get_or_create_nodeid())
     txtUser = docManifiest.createTextNode(getuser())
     txtOptions = docManifiest.createTextNode(argvs)
 
@@ -141,6 +146,7 @@ def addManifestFile(p_argv, p_tmp_dir):
     elRoot.appendChild(elVersion)
     elRoot.appendChild(elHostname)
     elRoot.appendChild(elUuid)
+    elRoot.appendChild(elNodeId)
     elRoot.appendChild(elTaken)
     elRoot.appendChild(elUser)
     elRoot.appendChild(elOptions)
@@ -154,6 +160,7 @@ def addManifestFile(p_argv, p_tmp_dir):
     elOptions.appendChild(txtOptions)
     elHostname.appendChild(txtHostname)
     elUuid.appendChild(txtUuid)
+    elNodeId.appendChild(txtNodeId)
 
     xml = docManifiest.toxml()
     # print xml
@@ -290,7 +297,7 @@ def compress_all_logs(p_path):
              % p_path
         return False
 
-def get_or_create_uuid():
+def get_or_create_nodeid():
     from uuid import uuid1
     from os.path import isfile
     cis_uuid_file = cs_version.getConfigDir() + "/management/cis.properties"
@@ -305,7 +312,28 @@ def get_or_create_uuid():
         cis_uuid_file.write(cis_file_content)
         cis_uuid_file.close()
         return cis_file_content
-		
+
+def get_uuid():
+    from shlex import split
+    from subprocess import Popen
+
+    """ we do not assume root user owns the cloud databases, we get the
+        username from /etc/cloud/management/db.properties
+    """
+    if(len(db_dict['db_clear_text_pass'])==0):
+        uuid_query = "mysql -e \"select md5(created) from user where id=1\" -u " + db_dict['db_cloud_username'] + \
+        " -h " +  db_dict['db_cloud_host'] + " cloud"
+    else:
+        uuid_query = "mysql -e \"select md5(created) from user where id=1\" -u " + db_dict['db_cloud_username'] + \
+        " -h " +  db_dict['db_cloud_host'] + " -p" + db_dict['db_clear_text_pass'] + " cloud" + "  --skip-column-names"
+
+    cmd_args = split(uuid_query)
+    try:
+        return os.popen(uuid_query).read()
+    except OSError as e:
+        print e
+
+	
 def get_rpm_version():
     return os.popen("rpm -qa cloudstack-management").read()
 
@@ -342,7 +370,7 @@ def get_db_properties():
         sections and ConfigParser expect to have at least one
     """
 
-    db_dict = {}
+    #db_dict = {}
     db_prop_file = cs_version.getConfigDir() + "/management/db.properties"
     db_dict["db_prop_file"] = db_prop_file
 
@@ -427,7 +455,7 @@ def sbs_system(p_tmp_dir):
     cmds = ["df -h", "ps axf", "top -b -n 1", "free -k", "netstat -nlp",
             "date", "dmesg", "uname -a", "whoami", "hostname",
             "ifconfig -a", "route -n", "ip addr sh", "uptime", "hostname -s",
-            "mount -l", "hostname --fqdn", "cloud-sccs", "rpm -qa", "lsb_release -a"]
+            "mount -l", "hostname --fqdn", "cloudstack-sccs", "rpm -qa", "lsb_release -a"]
     files = ["/etc/hosts","/etc/resolv.conf", "/etc/sysctl.conf", "/etc/issue", "/etc/init.d"]
 
     print_sbs_name(sbs_name)
@@ -488,14 +516,14 @@ def sbs_db(p_tmp_dir):
     """
     if(len(db_dict['db_clear_text_pass'])==0):
         mysqldump_cloud = "mysqldump -u " + db_dict['db_cloud_username'] + \
-        " -h localhost "  + " cloud"
+        " -h " + db_dict['db_cloud_host']  + " cloud"
         mysqldump_cloud_usage = "mysqldump -u " + db_dict['db_cloud_username'] + \
-        " -h localhost "  + " cloud_usage"
+        " -h " + db_dict['db_cloud_host']  + " cloud_usage"
     else:
         mysqldump_cloud = "mysqldump -u " + db_dict['db_cloud_username'] + \
-        " -h localhost -p" + db_dict['db_clear_text_pass'] + " cloud"
+        " -h " + db_dict['db_cloud_host'] + " -p" + db_dict['db_clear_text_pass'] + " cloud"
         mysqldump_cloud_usage = "mysqldump -u " + db_dict['db_cloud_username'] + \
-        " -h localhost -p" + db_dict['db_clear_text_pass'] + " cloud_usage"
+        " -h " + db_dict['db_cloud_host'] + " -p"  + db_dict['db_clear_text_pass'] + " cloud_usage"
 
     """ exec dump commands """
     if isdir(sbs_path):
@@ -532,7 +560,7 @@ def sbs_db(p_tmp_dir):
         for i in range(len_query_array - 1):
             #print i, query_array[i]
             query_cmd = "mysql -e \" " + query_array[i] + " \" " + \
-                            " -u" +  db_dict['db_cloud_username'] + " -Dcloud"
+                            " -h" + db_dict['db_cloud_host'] + " -u" +  db_dict['db_cloud_username'] + " -Dcloud"
             
             if(len(db_dict['db_clear_text_pass'])!=0):
                 query_cmd = query_cmd + " -p" + db_dict['db_clear_text_pass']
@@ -575,8 +603,8 @@ def sbs_logs(p_tmp_dir):
             ~(cloud_bugtool_mode.LOGS_CP_ALL |
                 cloud_bugtool_mode.LOGS_SYSTEM_ALL):
         #print "cloud_bugtool_mode.LOGS_CP_LATEST"
-    localtime = localtime()
-    str_date = strftime("%Y-%m-%d", localtime)
+        localtime = localtime()
+        str_date = strftime("%Y-%m-%d", localtime)
         files = ["access_log."+str_date+".txt", "apilog.log", 
             "catalina.out", "management-server.log", "setupManagement.log","manager."+str_date+".log" , "localhost."+str_date+".log"]
         logs_dir = cs_version.getLogDir() + "/management/"
@@ -587,7 +615,7 @@ def sbs_logs(p_tmp_dir):
                 cp_ar(full_path, sbs_path)
             else:
                 print "WARNING: file " + full_path + " does not exist"
-    files = ["awsapi.log"]
+        files = ["awsapi.log"]
         logs_dir = cs_version.getLogDir() + "/awsapi/"
         sbs_path = p_tmp_dir + "/system/"+cs_version.getLogDir()+"/awsapi/"
         for file in files:
@@ -683,8 +711,6 @@ def usage():
         "\t-m --minimal\t\t\t\tCollects only system properties and the"\
             " latest CloudPlatform log files\n" \
         "\t-d --nodb\t\t\t\tDo not include cloud database dump\n" \
-        "\t-s --nosystemvm\t\t\tSkip service VMs information "\
-            "[default, not implemented yet]\n" \
         "\n" \
         "Modes:\n" \
         " MINIMAL\tsystem info, latest CP log files\n" \
@@ -700,6 +726,13 @@ def usage():
             "http://support.citrix.com/"\
         "\n"
 
+        
+def get_db_details():
+    db_dict = get_db_properties()
+    """ as of now we can only decrypt db pass for file type encType """
+    if db_dict["db_enc_type"] != "file":
+        return None
+    decrypt_db_pass(db_dict)
 
 def main(p_argv):
     """
@@ -757,7 +790,7 @@ def main(p_argv):
     localtime = localtime()
     my_hostname = uname()[1]
     str_date = strftime("%Y.%m.%d-%H.%M.%S", localtime)
-    tmp_prefix = "cloudstack-bugtool_" + str_date + "."
+    tmp_prefix = "cloud-bugtool_" + str_date + "."
     tmp_dir = mkdtemp(prefix=tmp_prefix)
     """ tmp_dir is what we need to cleanup later,
         because we add hostname to tmp_dir so we save it as tmp_dir_rm  """
@@ -765,6 +798,9 @@ def main(p_argv):
     tmp_dir = tmp_dir + "/" + my_hostname
     mkdir(tmp_dir)
 
+    """ initialize dictionary """
+    get_db_details()
+    
     """ what MODE we are running? """
     #print "Mode: "+str(cloud_bugtool_mode.defGetMode())
 
