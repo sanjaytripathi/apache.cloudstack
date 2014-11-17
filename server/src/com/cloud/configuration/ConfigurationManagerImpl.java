@@ -38,6 +38,7 @@ import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
 import org.apache.log4j.Logger;
+
 import org.apache.cloudstack.acl.SecurityChecker;
 import org.apache.cloudstack.affinity.AffinityGroup;
 import org.apache.cloudstack.affinity.AffinityGroupService;
@@ -718,6 +719,21 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
             type = configKey.type();
         } else {
             type = c.getType();
+        }
+
+        String errMsg = null;
+        try {
+            if (type.equals(Integer.class)) {
+                errMsg = "There was error in trying to parse value: " + value + ". Please enter a valid integer value for parameter " + name;
+                Integer.parseInt(value);
+            } else if (type.equals(Float.class)) {
+                errMsg = "There was error in trying to parse value: " + value + ". Please enter a valid float value for parameter " + name;
+                Float.parseFloat(value);
+            }
+        } catch (Exception e) {
+            // catching generic exception as some throws NullPointerException and some throws NumberFormatExcpeion
+            s_logger.error(errMsg);
+            return errMsg;
         }
 
         if (value == null) {
