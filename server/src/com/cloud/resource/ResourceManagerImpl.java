@@ -1068,7 +1068,7 @@ public class ResourceManagerImpl extends ManagerBase implements ResourceManager,
                 try {
                     cluster.setManagedState(Managed.ManagedState.PrepareUnmanaged);
                     _clusterDao.update(cluster.getId(), cluster);
-                    List<HostVO> hosts = listAllUpAndEnabledHosts(Host.Type.Routing, cluster.getId(), cluster.getPodId(), cluster.getDataCenterId());
+                    List<HostVO> hosts = listHostsInClusterByStatus(cluster.getId(), Status.Up);
                     for (HostVO host : hosts) {
                         if (host.getType().equals(Host.Type.Routing) && !host.getStatus().equals(Status.Down) && !host.getStatus().equals(Status.Disconnected) &&
                             !host.getStatus().equals(Status.Up) && !host.getStatus().equals(Status.Alert)) {
