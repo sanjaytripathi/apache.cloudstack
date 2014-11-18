@@ -179,8 +179,8 @@ class TestAddNetworkToVirtualMachine(cloudstackTestCase):
 
         cls.services = Services().services
 
-        hypervisor = get_hypervisor_type(cls.api_client)
-        if hypervisor.lower() not in ["xenserver","kvm"]:
+        cls.hypervisor = get_hypervisor_type(cls.api_client)
+        if cls.hypervisor.lower() not in ["xenserver","kvm"]:
             raise unittest.SkipTest("This feature is supported only on XenServer and KVM")
 
         cls.services = Services().services
