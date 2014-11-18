@@ -3184,6 +3184,7 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
         // Check if the VLAN has any allocated public IPs
         List<IPAddressVO> ips = _publicIpAddressDao.listByVlanId(vlanDbId);
         if (isAccountSpecific) {
+          int resourceCountToBeDecrement = 0;
           try {
             vlanRange = _vlanDao.acquireInLockTable(vlanDbId, 30);
             if (vlanRange == null) {
@@ -3217,12 +3218,16 @@ public class ConfigurationManagerImpl extends ManagerBase implements Configurati
               if (!success) {
                 s_logger.warn("Some ip addresses failed to be released as a part of vlan " + vlanDbId + " removal");
               } else {
+                  resourceCountToBeDecrement++;
                   UsageEventUtils.publishUsageEvent(EventTypes.EVENT_NET_IP_RELEASE, acctVln.get(0).getAccountId(), ip.getDataCenterId(), ip.getId(),
                           ip.getAddress().toString(), ip.isSourceNat(), vlanRange.getVlanType().toString(), ip.getSystem(), ip.getClass().getName(), ip.getUuid());
               }
             }
           } finally {
             _vlanDao.releaseFromLockTable(vlanDbId);
+            if(resourceCountToBeDecrement > 0) {  //Making sure to decrement the count of only success operations above. For any reaason if disassociation fails then this number will vary from original range length.
+              _resourceLimitMgr.decrementResourceCount(acctVln.get(0).getAccountId(), ResourceType.public_ip, new Long(resourceCountToBeDecrement));
+            }
           }
         } else {   // !isAccountSpecific
           NicIpAliasVO ipAlias = _nicIpAliasDao.findByGatewayAndNetworkIdAndState(vlanRange.getVlanGateway(), vlanRange.getNetworkId(), NicIpAlias.state.active);
