@@ -309,16 +309,18 @@ public abstract class AgentAttache {
     }
 
     protected void cancelAllCommands(final Status state, final boolean cancelActive) {
-        final Set<Map.Entry<Long, Listener>> entries = _waitForList.entrySet();
-        final Iterator<Map.Entry<Long, Listener>> it = entries.iterator();
-        while (it.hasNext()) {
-            final Map.Entry<Long, Listener> entry = it.next();
-            it.remove();
-            final Listener monitor = entry.getValue();
-            if (s_logger.isDebugEnabled()) {
-                s_logger.debug(log(entry.getKey(), "Sending disconnect to " + monitor.getClass()));
+        if ( cancelActive ) {
+            final Set<Map.Entry<Long, Listener>> entries = _waitForList.entrySet();
+            final Iterator<Map.Entry<Long, Listener>> it = entries.iterator();
+            while (it.hasNext()) {
+                final Map.Entry<Long, Listener> entry = it.next();
+                it.remove();
+                final Listener monitor = entry.getValue();
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug(log(entry.getKey(), "Sending disconnect to " + monitor.getClass()));
+                }
+                monitor.processDisconnect(_id, state);
             }
-            monitor.processDisconnect(_id, state);
         }
     }
 
