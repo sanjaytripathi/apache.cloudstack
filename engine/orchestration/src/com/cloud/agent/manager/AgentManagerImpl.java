@@ -438,20 +438,24 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
 
     protected Status investigate(AgentAttache agent) {
         Long hostId = agent.getId();
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug("checking if agent (" + hostId + ") is alive");
-        }
-
-        Answer answer = easySend(hostId, new CheckHealthCommand());
-        if (answer != null && answer.getResult()) {
-            Status status = Status.Up;
+        HostVO host = _hostDao.findById(hostId);
+        if ( host != null && host.getType() != null && !host.getType().isVirtual() ) {
             if (s_logger.isDebugEnabled()) {
-                s_logger.debug("agent (" + hostId + ") responded to checkHeathCommand, reporting that agent is " + status);
+                s_logger.debug("checking if agent (" + hostId + ") is alive");
             }
-            return status;
-        }
 
-        return _haMgr.investigate(hostId);
+            Answer answer = easySend(hostId, new CheckHealthCommand());
+            if (answer != null && answer.getResult()) {
+                Status status = Status.Up;
+                if (s_logger.isDebugEnabled()) {
+                    s_logger.debug("agent (" + hostId + ") responded to checkHeathCommand, reporting that agent is " + status);
+                }
+                return status;
+            }
+
+            return _haMgr.investigate(hostId);
+        }
+        return Status.Alert;
     }
 
     protected AgentAttache getAttache(final Long hostId) throws AgentUnavailableException {
@@ -1511,12 +1515,7 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
                             disconnectWithoutInvestigation(agentId, Event.ShutdownRequested);
                         } else {
                             HostVO host = _hostDao.findById(agentId);
-                            if (host != null && (host.getType() == Host.Type.ConsoleProxy || host.getType() == Host.Type.SecondaryStorageVM
-                                    || host.getType() == Host.Type.SecondaryStorageCmdExecutor)) {
-
-                                s_logger.warn("Disconnect agent for CPVM/SSVM due to physical connection close. host: " + host.getId());
-                                disconnectWithoutInvestigation(agentId, Event.ShutdownRequested);
-                            } else {
+                            if (host != null ) {
                                 status_logger.debug("Ping timeout for host " + agentId + ", do invstigation");
                                 disconnectWithInvestigation(agentId, Event.PingTimeout);
                             }
