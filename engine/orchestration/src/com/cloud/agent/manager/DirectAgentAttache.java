@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+import org.apache.log4j.MDC;
+
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 
@@ -177,6 +179,9 @@ public class DirectAgentAttache extends AgentAttache {
                         s_logger.warn("Unable to get current status on " + _id + "(" + _name + ")");
                         return;
                     }
+                    if (cmd.getContextParam("logid") != null) {
+                        MDC.put("logcontextid", cmd.getContextParam("logid"));
+                    }
                     if (s_logger.isDebugEnabled()) {
                         s_logger.debug("Ping from " + _id + "(" + _name + ")");
                     }
@@ -241,6 +246,10 @@ public class DirectAgentAttache extends AgentAttache {
                 ArrayList<Answer> answers = new ArrayList<Answer>(cmds.length);
                 for (int i = 0; i < cmds.length; i++) {
                     Answer answer = null;
+                    Command currentCmd = cmds[i];
+                    if (currentCmd.getContextParam("logid") != null) {
+                        MDC.put("logcontextid", currentCmd.getContextParam("logid"));
+                    }
                     try {
                         if (resource != null) {
                             answer = resource.executeRequest(cmds[i]);
@@ -299,6 +308,10 @@ public class DirectAgentAttache extends AgentAttache {
                 ArrayList<Answer> answers = new ArrayList<Answer>(cmds.length);
                 for (int i = 0; i < cmds.length; i++) {
                     Answer answer = null;
+                    Command currentCmd = cmds[i];
+                    if (currentCmd.getContextParam("logid") != null) {
+                        MDC.put("logcontextid", currentCmd.getContextParam("logid"));
+                    }
                     try {
                         if (resource != null) {
                             answer = resource.executeRequest(cmds[i]);
