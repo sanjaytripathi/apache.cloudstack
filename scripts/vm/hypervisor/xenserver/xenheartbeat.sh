@@ -94,7 +94,8 @@ do
     mp=`mount | grep $dir`
     if [ -n "$mp" ]; then
       hb=$dir/hb-$host
-      date +%s | dd of=$hb count=100 bs=1 2>/dev/null
+      date +%s > /opt/cloud/bin/timestamp
+      /opt/cloud/bin/timeout $interval dd if=/opt/cloud/bin/timestamp of=$hb count=100 bs=1 2>/dev/null
       if [ $? -ne 0 ]; then
         /usr/bin/logger -t heartbeat "Potential problem with $hb: not reachable since $(($(date +%s) - $lastdate)) seconds"
       else
