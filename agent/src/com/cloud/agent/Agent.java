@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.naming.ConfigurationException;
 
 import org.apache.log4j.Logger;
+import org.slf4j.MDC;
 
 import org.apache.cloudstack.managed.context.ManagedContextTimerTask;
 
@@ -121,7 +122,7 @@ public class Agent implements HandlerFactory, IAgentControl {
     long _startupWait = _startupWaitDefault;
     boolean _reconnectAllowed = true;
     //For time sentitive task, e.g. PingTask
-    private ThreadPoolExecutor _ugentTaskPool;
+    private final ThreadPoolExecutor _ugentTaskPool;
     ExecutorService _executor;
 
     // for simulator use only
@@ -457,6 +458,9 @@ public class Agent implements HandlerFactory, IAgentControl {
                             requestLogged = true;
                         }
                         s_logger.debug("Processing command: " + cmd.toString());
+                        if (cmd.getContextParam("logid") != null) {
+                            MDC.put("logcontextid", cmd.getContextParam("logid"));
+                        }
                     }
 
                     if (cmd instanceof CronCommand) {
@@ -600,6 +604,9 @@ public class Agent implements HandlerFactory, IAgentControl {
         } else if (obj instanceof Request) {
             final Request req = (Request)obj;
             final Command command = req.getCommand();
+            if (command.getContextParam("logid") != null) {
+                MDC.put("logcontextid", command.getContextParam("logid"));
+            }
             Answer answer = null;
             _inProgress.incrementAndGet();
             try {
@@ -648,7 +655,7 @@ public class Agent implements HandlerFactory, IAgentControl {
 
     @Override
     public AgentControlAnswer sendRequest(AgentControlCommand cmd, int timeoutInMilliseconds) throws AgentControlChannelException {
-        Request request = new Request(this.getId(), -1, new Command[] {cmd}, true, false);
+        Request request = new Request(getId(), -1, new Command[] {cmd}, true, false);
         request.setSequence(getNextSequence());
 
         AgentControlListener listener = new AgentControlListener(request);
@@ -672,7 +679,7 @@ public class Agent implements HandlerFactory, IAgentControl {
 
     @Override
     public void postRequest(AgentControlCommand cmd) throws AgentControlChannelException {
-        Request request = new Request(this.getId(), -1, new Command[] {cmd}, true, false);
+        Request request = new Request(getId(), -1, new Command[] {cmd}, true, false);
         request.setSequence(getNextSequence());
         postRequest(request);
     }
@@ -803,7 +810,7 @@ public class Agent implements HandlerFactory, IAgentControl {
 
         @Override
         protected void doTask(Task task) throws Exception {
-            Request req = (Request)this.get();
+            Request req = (Request)get();
             if (!(req instanceof Response)) {
                 processRequest(req, task.getLink());
             }
@@ -835,7 +842,7 @@ public class Agent implements HandlerFactory, IAgentControl {
                     } else {
                         //put the requests from mgt server into another thread pool, as the request may take a longer time to finish. Don't block the NIO main thread pool
                         //processRequest(request, task.getLink());
-                        _executor.execute(new AgentRequestHandler(this.getType(), this.getLink(), request));
+                        _executor.execute(new AgentRequestHandler(getType(), getLink(), request));
                     }
                 } catch (final ClassNotFoundException e) {
                     s_logger.error("Unable to find this request ");
