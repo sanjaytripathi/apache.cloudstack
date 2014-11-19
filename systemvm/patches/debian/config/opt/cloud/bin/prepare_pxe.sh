@@ -32,6 +32,8 @@ success() {
 TFTP_ROOT='/opt/tftpboot'
 PXELINUX_CFG_DIR='/opt/tftpboot/pxelinux.cfg'
 
+mkdir -p $PXELINUX_CFG_DIR
+
 kernel_nfs_path=$1
 kernel_file_name=`basename $kernel_nfs_path`
 initrd_nfs_path=$2
