@@ -7,7 +7,6 @@ function usage() {
  echo "./install.sh -b | --install-baremetal (Install BareMetal Agent)";
  echo "./install.sh -s | --installus-user (Install the Usage Monitor)";
  echo "./install.sh -d | --installdb-database (Install the database server (from distribution's repo))";
- echo "./install.sh -l | --install-mysql (Install the MySQL 5.1.58 (only for CentOS5.x, Rhel6.x naturally has higher version MySql))";
  echo "./install.sh --install-management --install-agent --install-baremetal --install-user --install-database --install-mysql (Installing everything in one short using long option);"
  echo "./install.sh -m -a -b -s -d -l (Installing everything in one short using short option);"
  echo "./install.sh -u|--upgrade cloudstack|cdsk (Upgrade the CloudPlatform packages installed on this machine)";
@@ -17,8 +16,6 @@ function usage() {
  echo ""
  exit 1;
  }
-
-. scripts/install_mysql5158_rpm.sh
 
 function cleanup() {
     rm -f /etc/yum.repos.d/cloud-temp.repo || true
@@ -81,8 +78,6 @@ installus="    S) Install the Usage Monitor
 "
 installdb="    D) Install the database server (from distribution's repo)      
 "
-installmysql5158="    L) Install the MySQL 5.1.58 (only for CentOS5.x, Rhel6.x naturally has higher version MySql)
-"
 quitoptio="    Q) Quit
 "
 unset removedb
@@ -108,7 +103,6 @@ mysql_note=""
 
 if installed mysql-server ; then
     unset installdb
-    unset installmysql5158
     removedb="    E) Remove the MySQL server (will not remove the MySQL databases)
 "
     mysql_note="3.We detect you already have MySql server installed, you can bypass mysql install chapter in CloudPlatform installation guide.
@@ -116,10 +110,6 @@ if installed mysql-server ; then
         For MySql downloaded from community, the script may not be able to detect it."
 fi
 
-if installed MySQL-server-community-5.1.58 || installed MySQL-client-community-5.1.58; then
-    unset installmysql5158
-    unset installdb
-fi
 
 if [ $# -lt 1 ] ; then
 
@@ -131,7 +121,7 @@ setuprepo
 		For installing CloudPlatform on RHEL6.x, please setup distribution yum repo either from ISO or from your registeration account.
 		$mysql_note
 
-$installms$installag$installbm$installus$installdb$upgrade$remove$removedb$installmysql5158$quitoptio > " installtype
+$installms$installag$installbm$installus$installdb$upgrade$remove$removedb$quitoptio > " installtype
 
 fi
 
