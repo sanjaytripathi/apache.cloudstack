@@ -448,6 +448,9 @@ public class Agent implements HandlerFactory, IAgentControl {
                 final Command cmd = cmds[i];
                 Answer answer;
                 try {
+                    if (cmd.getContextParam("logid") != null) {
+                        MDC.put("logcontextid", cmd.getContextParam("logid"));
+                    }
                     if (s_logger.isDebugEnabled()) {
                         if (!requestLogged) // ensures request is logged only once per method call
                         {
@@ -458,11 +461,7 @@ public class Agent implements HandlerFactory, IAgentControl {
                             requestLogged = true;
                         }
                         s_logger.debug("Processing command: " + cmd.toString());
-                        if (cmd.getContextParam("logid") != null) {
-                            MDC.put("logcontextid", cmd.getContextParam("logid"));
-                        }
                     }
-
                     if (cmd instanceof CronCommand) {
                         final CronCommand watch = (CronCommand)cmd;
                         scheduleWatch(link, request, watch.getInterval() * 1000, watch.getInterval() * 1000);
