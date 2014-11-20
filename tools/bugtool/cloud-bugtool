@@ -722,8 +722,7 @@ def usage():
             "switch off some particular things"\
             " and don't collect them if needed\n\n" \
         "BUG(s) and feedback please send to: "\
-            "vaibhav.gupta@citrix.com or visit "\
-            "http://support.citrix.com/"\
+            " http://support.citrix.com/"\
         "\n"
 
         
