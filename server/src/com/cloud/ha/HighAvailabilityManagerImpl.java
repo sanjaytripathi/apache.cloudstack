@@ -237,25 +237,27 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
 
         final List<VMInstanceVO> vms = _instanceDao.listByHostId(host.getId());
         final DataCenterVO dcVO = _dcDao.findById(host.getDataCenterId());
-
+        List<VMInstanceVO> mvms = new ArrayList<VMInstanceVO>();
         // send an email alert that the host is down
         StringBuilder sb = null;
         if ((vms != null) && !vms.isEmpty()) {
             sb = new StringBuilder();
             sb.append("  Starting HA on the following VMs: ");
             // collect list of vm names for the alert email
-            VMInstanceVO vm = vms.get(0);
-            if (vm.isHaEnabled()) {
-                sb.append(" " + vm);
-            }
-            for (int i = 1; i < vms.size(); i++) {
-                vm = vms.get(i);
+            for (int i = 0; i < vms.size(); i++) {
+                VMInstanceVO vm = vms.get(i);
+                String name = vm.getInstanceName();
+                if ( name.startsWith("i-") ) {
+                    mvms.add(vm);
+                } else {
+                    mvms.add(0, vm);
+                }
                 if (vm.isHaEnabled()) {
                     sb.append(" " + vm.getHostName());
                 }
             }
         }
-
+        s_logger.debug(sb);
         // send an email alert that the host is down, include VMs
         HostPodVO podVO = _podDao.findById(host.getPodId());
         String hostDesc = "name: " + host.getName() + " (id:" + host.getId() + "), availability zone: " + dcVO.getName() + ", pod: " + podVO.getName();
@@ -264,7 +266,7 @@ public class HighAvailabilityManagerImpl extends ManagerBase implements HighAvai
             "] is down." +
             ((sb != null) ? sb.toString() : ""));
 
-        for (VMInstanceVO vm : vms) {
+        for (VMInstanceVO vm : mvms) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("Notifying HA Mgr of to restart vm " + vm.getId() + "-" + vm.getInstanceName());
             }
