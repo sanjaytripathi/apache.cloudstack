@@ -16,6 +16,7 @@
 # under the License.
 
 %define __os_install_post %{nil}
+%define __prelink_undo_cmd %{nil}
 %global debug_package %{nil}
 
 # DISABLE the post-percentinstall java repacking and line number stripping
@@ -671,7 +672,6 @@ fi
 %attr(0644,root,root) %{python_sitearch}/cloud_utils.pyc
 %attr(0644,root,root) %{python_sitearch}/cloudutils/*
 %attr(0644, root, root) %{_datadir}/%{name}-common/lib/jasypt-1.9.0.jar
-%attr(0644, root, root) %{_datadir}/%{name}-common/scripts/vm/hypervisor/xenserver/vhd-util
 %{_defaultdocdir}/%{name}-common-%{version}/LICENSE
 %{_defaultdocdir}/%{name}-common-%{version}/NOTICE
 
