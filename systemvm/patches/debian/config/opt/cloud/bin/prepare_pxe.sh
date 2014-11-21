@@ -31,8 +31,13 @@ success() {
 
 TFTP_ROOT='/opt/tftpboot'
 PXELINUX_CFG_DIR='/opt/tftpboot/pxelinux.cfg'
+PXELINUX_0='/opt/tftpboot/pxelinux.0'
 
 mkdir -p $PXELINUX_CFG_DIR
+
+if [ ! -f $PXELINUX_0 ]; then
+   yes | cp /etc/pxelinux.0 $PXELINUX_0
+fi
 
 kernel_nfs_path=$1
 kernel_file_name=`basename $kernel_nfs_path`
