@@ -3661,41 +3661,20 @@
                                                     success: function(data) {
                                                     	var jobID = data.createloadbalancerruleresponse.jobid;
                                                         var lbID = data.createloadbalancerruleresponse.id;
-                                                         
-                                                        var selectedVMs = args.itemData;
                                                         var inputData = {
-                                                            id: data.createloadbalancerruleresponse.id,
-                                                            virtualmachineids: $.map(selectedVMs, function(elem) {
-                                                                return elem.id;
-                                                            }).join(',')
-                                                        };  
-                                                        //to enable "secondary IP in load balancing", comment the section above and uncomment the section below.
-                                                                                                                
-                                                        /*
-                                                        var inputData = {
-                                                            id: data.createloadbalancerruleresponse.id  
-                                                        };                                                           
+                                                            id: data.createloadbalancerruleresponse.id
+                                                        };
                                                         var selectedVMs = args.itemData;
+
                                                         if (selectedVMs != null) {
                                                         	var vmidipmapIndex = 0;
-                                                    		for (var vmIndex = 0; vmIndex < selectedVMs.length; vmIndex++) {      
-                                                    			var selectedIPs = selectedVMs[vmIndex]._subselect;
-                                                    			for (var ipIndex = 0; ipIndex < selectedIPs.length; ipIndex++) {
-                                                    				inputData['vmidipmap[' + vmidipmapIndex + '].vmid'] = selectedVMs[vmIndex].id;
-                                                        			
-                                                    				if (args.context.ipAddresses[0].isportable) {
-                                                        			    inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex].split(',')[1];  
-                                                        			} else {
-                                                        				inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedIPs[ipIndex];
-                                                        			}
-                                                    				
-                                                    				vmidipmapIndex++;
-                                                    			}                                                			
+                                                    		for (var vmIndex = 0; vmIndex < selectedVMs.length; vmIndex++) {
+                                                                inputData['vmidipmap[' + vmidipmapIndex + '].vmid'] = selectedVMs[vmInde9x].id;
+                                                                inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedVMs[vmIndex]._subselect;
                                                     		}
-                                                    	}   
-                                                        */      
-                                                        
-                                                        /* 
+                                                    	}
+
+                                                        /*
                                                          * e.g. first VM(xxx) has two IPs(10.1.1.~), second VM(yyy) has three IPs(10.2.2.~):
                                                          * vmidipmap[0].vmid=xxx  vmidipmap[0].vmip=10.1.1.11 
                                                          * vmidipmap[1].vmid=xxx  vmidipmap[1].vmip=10.1.1.12 
