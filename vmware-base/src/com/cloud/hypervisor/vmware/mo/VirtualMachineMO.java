@@ -1077,12 +1077,40 @@ public class VirtualMachineMO extends BaseMO {
         if (!isVmfsSparseFile) {
             String currentAdapterType = vmdkFileDescriptor.getAdapterType();
             if (!currentAdapterType.equalsIgnoreCase(newAdapterType)) {
-                s_logger.info("Updating AdapterType for VMDK file " + vmdkFileName);
+                s_logger.info("Updating adapter type to " + newAdapterType + " for VMDK file " + vmdkFileName);
                 Pair<DatacenterMO, String> dcInfo = getOwnerDatacenter();
                 byte[] newVmdkContent = vmdkFileDescriptor.changeVmdkAdapterType(vmdkInfo.second(), newAdapterType);
                 String vmdkUploadUrl = getContext().composeDatastoreBrowseUrl(dcInfo.first().getName(), vmdkFileName);
                 getContext().uploadResourceContent(vmdkUploadUrl, newVmdkContent);
                 s_logger.info("Updated VMDK file " + vmdkFileName);
+            }
+        }
+    }
+
+    public void updateAdapterTypeIfRequired(String vmdkFileName) throws Exception {
+        // Validate existing adapter type of VMDK file. Update it with a supported adapter type if validation fails.
+        Pair<VmdkFileDescriptor, byte[]> vmdkInfo = getVmdkFileInfo(vmdkFileName);
+        VmdkFileDescriptor vmdkFileDescriptor = vmdkInfo.first();
+
+        boolean isVmfsSparseFile = vmdkFileDescriptor.isVmfsSparseFile();
+        if (!isVmfsSparseFile) {
+            String currentAdapterTypeStr = vmdkFileDescriptor.getAdapterType();
+            if (s_logger.isTraceEnabled()) {
+                s_logger.trace("Detected adapter type  " + currentAdapterTypeStr + " for VMDK file " + vmdkFileName);
+            }
+            VmdkAdapterType currentAdapterType = VmdkAdapterType.getType(currentAdapterTypeStr);
+            if (currentAdapterType == VmdkAdapterType.none) {
+                // Value of currentAdapterType can be VmdkAdapterType.none only if adapter type of vmdk is set to either
+                // lsisas1068 (SAS controller) or pvscsi (Vmware Paravirtual) only. Valid adapter type for those controllers is lsilogic.
+                // Hence use adapter type lsilogic. Other adapter types ide, lsilogic, buslogic are valid and does not need to be modified.
+                VmdkAdapterType newAdapterType = VmdkAdapterType.lsilogic;
+                s_logger.debug("Updating adapter type to " + newAdapterType + " from " + currentAdapterTypeStr + " for VMDK file " + vmdkFileName);
+                Pair<DatacenterMO, String> dcInfo = getOwnerDatacenter();
+                byte[] newVmdkContent = vmdkFileDescriptor.changeVmdkAdapterType(vmdkInfo.second(), newAdapterType.toString());
+                String vmdkUploadUrl = getContext().composeDatastoreBrowseUrl(dcInfo.first().getName(), vmdkFileName);
+
+                getContext().uploadResourceContent(vmdkUploadUrl, newVmdkContent);
+                s_logger.debug("Updated VMDK file " + vmdkFileName);
             }
         }
     }
@@ -1118,7 +1146,15 @@ public class VirtualMachineMO extends BaseMO {
             unitNumber = newDisk.getUnitNumber();
             VirtualDiskFlatVer2BackingInfo backingInfo = (VirtualDiskFlatVer2BackingInfo)newDisk.getBacking();
             String vmdkFileName = backingInfo.getFileName();
-            updateVmdkAdapter(vmdkFileName, DiskControllerType.getType(diskController).toString());
+        DiskControllerType diskControllerType = DiskControllerType.getType(diskController);
+        VmdkAdapterType vmdkAdapterType = VmdkAdapterType.getAdapterType(diskControllerType);
+        if (vmdkAdapterType == VmdkAdapterType.none) {
+            String message = "Failed to attach disk due to invalid vmdk adapter type for vmdk file [" +
+                    vmdkFileName + "] with controller : " + diskControllerType;
+            s_logger.debug(message);
+            throw new Exception(message);
+        }
+        updateVmdkAdapter(vmdkFileName, vmdkAdapterType.toString());
             VirtualMachineConfigSpec reConfigSpec = new VirtualMachineConfigSpec();
             VirtualDeviceConfigSpec deviceConfigSpec = new VirtualDeviceConfigSpec();
 

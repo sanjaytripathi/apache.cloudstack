@@ -80,6 +80,7 @@ import com.vmware.vim25.VirtualDeviceBackingInfo;
 import com.vmware.vim25.VirtualDeviceConfigSpec;
 import com.vmware.vim25.VirtualDeviceConfigSpecOperation;
 import com.vmware.vim25.VirtualDisk;
+import com.vmware.vim25.VirtualDiskFlatVer2BackingInfo;
 import com.vmware.vim25.VirtualEthernetCard;
 import com.vmware.vim25.VirtualEthernetCardDistributedVirtualPortBackingInfo;
 import com.vmware.vim25.VirtualEthernetCardNetworkBackingInfo;
@@ -595,6 +596,11 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
                 throw new Exception("No such disk device: " + path);
             }
             VirtualDisk disk = vdisk.first();
+            String vmdkAbsFile = getAbsoluteVmdkFile(disk);
+            if (vmdkAbsFile != null && !vmdkAbsFile.isEmpty()) {
+                vmMo.updateAdapterTypeIfRequired(vmdkAbsFile);
+            }
+
             disk.setCapacityInKB(newSize);
 
             VirtualMachineConfigSpec vmConfigSpec = new VirtualMachineConfigSpec();
@@ -3174,7 +3180,12 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
                         ".vmdk");
                 diskLocator = new VirtualMachineRelocateSpecDiskLocator();
                 diskLocator.setDatastore(morDsAtSource);
-                int diskId = getVirtualDiskInfo(vmMo, volume.getPath() + ".vmdk");
+                Pair<VirtualDisk, String> diskInfo = getVirtualDiskInfo(vmMo, volume.getPath() + ".vmdk");
+                String vmdkAbsFile = getAbsoluteVmdkFile(diskInfo.first());
+                if (vmdkAbsFile != null && !vmdkAbsFile.isEmpty()) {
+                    vmMo.updateAdapterTypeIfRequired(vmdkAbsFile);
+                }
+                int diskId = diskInfo.first().getKey();
                 diskLocator.setDiskId(diskId);
 
                 diskLocators.add(diskLocator);
@@ -3316,7 +3327,13 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
 
             DatastoreMO targetDsMo = new DatastoreMO(srcHyperHost.getContext(), morDs);
             String fullVolumePath = VmwareStorageLayoutHelper.getVmwareDatastorePathFromVmdkFileName(targetDsMo, vmName, volumePath + ".vmdk");
-            int diskId = getVirtualDiskInfo(vmMo, volumePath + ".vmdk");
+            Pair<VirtualDisk, String> diskInfo = getVirtualDiskInfo(vmMo, volumePath + ".vmdk");
+            String vmdkAbsFile = getAbsoluteVmdkFile(diskInfo.first());
+            if (vmdkAbsFile != null && !vmdkAbsFile.isEmpty()) {
+                vmMo.updateAdapterTypeIfRequired(vmdkAbsFile);
+            }
+            int diskId = diskInfo.first().getKey();
+
             diskLocator = new VirtualMachineRelocateSpecDiskLocator();
             diskLocator.setDatastore(morDs);
             diskLocator.setDiskId(diskId);
@@ -3360,12 +3377,12 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
         }
     }
 
-    private int getVirtualDiskInfo(VirtualMachineMO vmMo, String srcDiskName) throws Exception {
+    private Pair<VirtualDisk, String> getVirtualDiskInfo(VirtualMachineMO vmMo, String srcDiskName) throws Exception {
         Pair<VirtualDisk, String> deviceInfo = vmMo.getDiskDevice(srcDiskName, true);
         if (deviceInfo == null) {
             throw new Exception("No such disk device: " + srcDiskName);
         }
-        return deviceInfo.first().getKey();
+        return deviceInfo;
     }
 
     private VmwareHypervisorHost getTargetHyperHost(DatacenterMO dcMo, String destIp) throws Exception {
@@ -5185,4 +5202,13 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
         }
     }
 
+    private String getAbsoluteVmdkFile(VirtualDisk disk) {
+        String vmdkAbsFile = null;
+        VirtualDeviceBackingInfo backingInfo = ((VirtualDisk)disk).getBacking();
+        if (backingInfo instanceof VirtualDiskFlatVer2BackingInfo) {
+            VirtualDiskFlatVer2BackingInfo diskBackingInfo = (VirtualDiskFlatVer2BackingInfo)backingInfo;
+            vmdkAbsFile = diskBackingInfo.getFileName();
+        }
+        return vmdkAbsFile;
+    }
 }
