@@ -46,6 +46,7 @@ initrd_file_name=`basename $initrd_nfs_path`
 tmpt_uuid=$3
 pxe_cfg_filename=$4
 ks_file=$5
+mac=$6
 
 kernel_path=$tmpt_uuid/$kernel_file_name
 initrd_path=$tmpt_uuid/$initrd_file_name
@@ -57,7 +58,7 @@ TIMEOUT 26
 DISPLAY boot.msg
 LABEL default
 KERNEL $kernel_path
-APPEND ramdisk_size=66000 initrd=$initrd_path ks=$ks_file
+APPEND ramdisk_size=66000 initrd=$initrd_path ks=$ks_file ksdevice=$mac ks.device=$mac
 
 EOF
 
