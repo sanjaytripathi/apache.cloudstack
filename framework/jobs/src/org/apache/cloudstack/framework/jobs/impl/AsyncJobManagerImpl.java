@@ -34,7 +34,6 @@ import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
 import org.apache.log4j.NDC;
 
 import org.apache.cloudstack.api.ApiErrorCode;
@@ -486,13 +485,10 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
                 if (CallContext.current() == null)
                     CallContext.registerPlaceHolderContext();
 
-                if (job.getRelated() != null && !job.getRelated().isEmpty()) {
+                if (job.getRelated() != null && !job.getRelated().isEmpty())
                     NDC.push("job-" + job.getRelated() + "/" + "job-" + job.getId());
-                    MDC.put("logcontextid", _jobDao.findByIdIncludingRemoved(Long.parseLong(job.getRelated())).getShortUuid());
-                } else {
+                else
                     NDC.push("job-" + job.getId());
-                    MDC.put("logcontextid", job.getShortUuid());
-                }
                 try {
                     super.run();
                 } finally {
@@ -519,12 +515,6 @@ public class AsyncJobManagerImpl extends ManagerBase implements AsyncJobManager,
 
                     _jobMonitor.registerActiveTask(runNumber, job.getId());
                     AsyncJobExecutionContext.setCurrentExecutionContext(new AsyncJobExecutionContext(job));
-                    if (job.getRelated() != null && !job.getRelated().isEmpty()) {
-                        AsyncJob relatedJob = _jobDao.findByIdIncludingRemoved(Long.parseLong(job.getRelated()));
-                        MDC.put("logcontextid", relatedJob.getShortUuid());
-                    } else {
-                        MDC.put("logcontextid", job.getShortUuid());
-                    }
 
                     // execute the job
                     if (s_logger.isDebugEnabled()) {

@@ -39,14 +39,12 @@ import javax.inject.Inject;
 import javax.naming.ConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.slf4j.MDC;
 
 import org.apache.cloudstack.framework.config.ConfigKey;
 import org.apache.cloudstack.framework.config.Configurable;
 import org.apache.cloudstack.framework.config.dao.ConfigurationDao;
 import org.apache.cloudstack.framework.jobs.AsyncJob;
 import org.apache.cloudstack.framework.jobs.AsyncJobExecutionContext;
-import org.apache.cloudstack.framework.jobs.dao.AsyncJobDao;
 import org.apache.cloudstack.managed.context.ManagedContextRunnable;
 import org.apache.cloudstack.utils.identity.ManagementServerNode;
 
@@ -150,8 +148,6 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
     protected ConfigurationDao _configDao = null;
     @Inject
     protected ClusterDao _clusterDao = null;
-    @Inject
-    protected AsyncJobDao _asyncJobDao = null;
 
     @Inject
     protected HighAvailabilityManager _haMgr = null;
@@ -383,20 +379,15 @@ public class AgentManagerImpl extends ManagerBase implements AgentManager, Handl
         return !txn.dbTxnStarted();
     }
 
-    private void tagCommand(Command cmd) {
+    private static void tagCommand(Command cmd) {
         AsyncJobExecutionContext context = AsyncJobExecutionContext.getCurrent();
         if (context != null && context.getJob() != null) {
             AsyncJob job = context.getJob();
 
-            if (job.getRelated() != null && !job.getRelated().isEmpty()) {
+            if (job.getRelated() != null && !job.getRelated().isEmpty())
                 cmd.setContextParam("job", "job-" + job.getRelated() + "/" + "job-" + job.getId());
-            } else {
+            else
                 cmd.setContextParam("job", "job-" + job.getId());
-            }
-        }
-        //TODO - why would below be empty? System cron tasks dont go through managedcontext?
-        if (MDC.get("logcontextid") != null && !MDC.get("logcontextid").isEmpty()) {
-            cmd.setContextParam("logid", MDC.get("logcontextid"));
         }
     }
 
