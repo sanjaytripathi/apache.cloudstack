@@ -1092,6 +1092,7 @@
                                     },
                                     
                                     detailView: {
+                                        noCompact: true,
                                         actions: {
                                              remove: {
                                                  label: 'label.action.delete.template',
