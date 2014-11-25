@@ -141,7 +141,7 @@ class Server(object):
     def notify_provisioning_done(self, mac):
         sig = self._make_sign(mac)
         cmd = 'http://%s:%s/client/api?command=notifyBaremetalProvisionDone&mac=%s&apiKey=%s&signature=%s' % (self._get_mgmt_ip(), self._get_mgmt_port(), mac, self.apikey, sig)
-        shell("curl -X GET '%s'" % cmd)
+        shell("wget '%s'" % cmd)
         return ''
 
 server = None
