@@ -41,7 +41,7 @@ public class LogContextListener implements ManagedContextListener<Object> {
     @Override
     public void onLeaveContext(Object unused, boolean reentry) {
         if (!reentry) {
-            LogContext.unregisterAll();
+            LogContext.unregister();
         }
     }
 

@@ -18,7 +18,6 @@ package org.apache.cloudstack.context;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Stack;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
@@ -40,13 +39,6 @@ import com.cloud.utils.exception.CloudRuntimeException;
 public class LogContext {
     private static final Logger s_logger = Logger.getLogger(LogContext.class);
     private static ManagedThreadLocal<LogContext> s_currentContext = new ManagedThreadLocal<LogContext>();
-    //Keep context stack for now to maintain, this is going to be pretty much useless
-    private static ManagedThreadLocal<Stack<LogContext>> s_currentContextStack = new ManagedThreadLocal<Stack<LogContext>>() {
-        @Override
-        protected Stack<LogContext> initialValue() {
-            return new Stack<LogContext>();
-        }
-    };
 
     private String logContextId;
     private Account account;
@@ -117,8 +109,8 @@ public class LogContext {
         LogContext context = s_currentContext.get();
 
         // TODO other than async job and api dispatches, there are many system background running threads
-        // that do not setup CallContext at all, however, many places in code that are touched by these background tasks
-        // assume not-null CallContext. Following is a fix to address therefore caused NPE problems
+        // that do not setup LogContext at all, however, many places in code that are touched by these background tasks
+        // assume not-null LogContext. Following is a fix to address therefore caused NPE problems
         //
         // There are security implications with this. It assumes that all system background running threads are
         // indeed have no problem in running under system context.
@@ -162,17 +154,12 @@ public class LogContext {
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("Registered for log: " + callingContext);
         }
-
-        s_currentContextStack.get().push(callingContext);
-
         return callingContext;
     }
 
     public static LogContext registerPlaceHolderContext() {
         LogContext context = new LogContext(0, 0, UUID.randomUUID().toString());
         s_currentContext.set(context);
-
-        s_currentContextStack.get().push(context);
         return context;
     }
 
@@ -231,45 +218,15 @@ public class LogContext {
         return register(user, account, contextId);
     }
 
-    public static void unregisterAll() {
-        while (unregister() != null) {
-            // NOOP
-        }
-    }
-
-    //this needs better semantics
-    public static LogContext unregister() {
+    public static void unregister() {
         LogContext context = s_currentContext.get();
-        if (context == null) {
-            return null;
-        }
-        s_currentContext.remove();
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("Unregistered: " + context);
-        }
-        String contextId = context.getLogContextId();
-        String sessionIdOnStack = null;
-        String sessionIdPushedToMDC = UuidUtils.first(contextId);
-
-        while ((sessionIdOnStack = MDC.get("logcontextid")) != null) {
-            if (sessionIdOnStack.isEmpty() || sessionIdPushedToMDC.equals(sessionIdOnStack)) {
-                break;
-            }
+        if (context != null) {
+            s_currentContext.remove();
             if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Clearing from MDC: " + contextId);
+                s_logger.trace("Unregistered: " + context);
             }
         }
-
-        Stack<LogContext> stack = s_currentContextStack.get();
-        stack.pop();
-
-        if (!stack.isEmpty()) {
-            s_currentContext.set(stack.peek());
-        } else {
-            s_currentContext.set(null);
-        }
-
-        return context;
+        MDC.clear();
     }
 
     public void setStartEventId(long startEventId) {
