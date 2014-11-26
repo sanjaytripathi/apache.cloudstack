@@ -1,1 +1,1 @@
-select version, updated, step from version
+select version, updated, step from version;

@@ -1,1 +1,1 @@
-select component,name,value from configuration order by component,name
+select component,name,value from configuration order by component,name;

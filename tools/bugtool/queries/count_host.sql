@@ -1,1 +1,2 @@
-select count(*) from host
+select count(*) from host;
+
