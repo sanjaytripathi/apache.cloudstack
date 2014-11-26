@@ -207,7 +207,7 @@ public class BaremetalVlanManagerImpl extends ManagerBase implements BaremetalVl
     private RackPair findRack(BaremetalRct rct, String mac) {
         for (BaremetalRct.Rack rack : rct.getRacks()) {
             for (BaremetalRct.HostEntry host : rack.getHosts()) {
-                if (mac.equals(host.getMac())) {
+                if (mac.toLowerCase().equals(host.getMac().toLowerCase())) {
                     RackPair p = new RackPair();
                     p.host = host;
                     p.rack = rack;
