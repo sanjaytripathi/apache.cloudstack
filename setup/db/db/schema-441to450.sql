@@ -958,3 +958,9 @@ INSERT INTO `cloud`.`vm_template` (id, uuid, unique_name, name, public, created,
     VALUES (11, UUID(), 'centos7-x86_64-lxc', 'CentOS 7(64-bit) no GUI (LXC)', 1, now(), 'BUILTIN', 0, 64, 1, 'http://download.cloud.com/templates/builtin/centos-7-x86_64.tar.gz', 'c2c4fa2d0978121c7977db571f132d6e', 0, 'CentOS 7(64-bit) no GUI (LXC)', 'TAR', 246, 1, 1, 'LXC', 1, 'Active');
 
 ALTER TABLE `cloud`.`user` ADD COLUMN `source` varchar(40) NOT NULL DEFAULT 'UNKNOWN';
+
+UPDATE IGNORE `cloud`.`configuration` SET `default_value`='PBKDF2,SHA256SALT,MD5,LDAP,SAML2,PLAINTEXT' WHERE name='user.authenticators.order';
+UPDATE IGNORE `cloud`.`configuration` SET `value`='PBKDF2,SHA256SALT,MD5,LDAP,SAML2,PLAINTEXT' WHERE name='user.authenticators.order';
+UPDATE IGNORE `cloud`.`configuration` SET `default_value`='PBKDF2,SHA256SALT,MD5,LDAP,SAML2,PLAINTEXT' WHERE name='user.password.encoders.order';
+UPDATE IGNORE `cloud`.`configuration` SET `value`='PBKDF2,SHA256SALT,MD5,LDAP,SAML2,PLAINTEXT' WHERE name='user.password.encoders.order';
+UPDATE IGNORE `cloud`.`configuration` SET `value`="MD5,LDAP,PLAINTEXT" WHERE `name`="user.password.encoders.exclude";
