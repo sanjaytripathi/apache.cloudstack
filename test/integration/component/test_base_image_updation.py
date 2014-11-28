@@ -26,10 +26,9 @@
 
 #Import Local Modules
 from marvin.codes import (PASS,
-                          FAIL,
                           RECURRING)
 from nose.plugins.attrib import attr
-from marvin.cloudstackTestCase import *
+from marvin.cloudstackTestCase import cloudstackTestCase
 
 from marvin.lib.base import (ServiceOffering,
                                          Account,
@@ -163,7 +162,7 @@ class TestBaseImageUpdate(cloudstackTestCase):
     def setUpClass(cls):
         cls.testClient = super(TestBaseImageUpdate, cls).getClsTestClient()
         cls.api_client = cls.testClient.getApiClient()
-        cls.hypervisor = cls.testClient.getHypervisorInfo()
+
         cls.services = Services().services
         # Get Zone, Domain and templates
         cls.domain = get_domain(cls.api_client)
@@ -441,7 +440,7 @@ class TestBaseImageUpdate(cloudstackTestCase):
                                                                 template.id
                                                                 ))
                 template.download(self.apiclient)
-                self.cleanup.append(template)
+                self._cleanup.append(template)
 
                 # Wait for template status to be changed across
                 time.sleep(self.services["sleep"])
@@ -529,8 +528,6 @@ class TestBaseImageUpdate(cloudstackTestCase):
         1) New root disk should be formed
         2) The recurring snapshot rule should be deleted
         """
-        if self.hypervisor.lower() in ['hyperv']:
-            raise unittest.skipTest("Snapshots feature is not supported on Hyper-V")
         vms = VirtualMachine.list(
                                   self.apiclient,
                                   id=self.vm_with_reset.id,
@@ -652,13 +649,13 @@ class TestBaseImageUpdate(cloudstackTestCase):
                    Here we are passing root disk id of vm before reboot which does not exist hence\
                    listing should fail")
 
-        try:
+        with self.assertRaises(Exception):
             listSnapshotPolicies = SnapshotPolicy.list(
                                         self.apiclient,
                                         volumeid=vm_with_reset_root_disk_id)
-        except Exception as e:
-            self.fail("Failed to list snapshot policies: %s" % e)
-
-        self.assertEqual(validateList(listSnapshotPolicies)[0], FAIL,\
-                "Snapshot policies list should be empty")
+            self.assertEqual(
+                    validateList(listSnapshotPolicies)[0],
+                    PASS,
+                    "snapshot policies list validation failed"
+                    )
         return
