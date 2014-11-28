@@ -120,6 +120,7 @@ import com.cloud.utils.Pair;
 import com.cloud.utils.db.DB;
 import com.cloud.utils.db.EntityManager;
 import com.cloud.utils.exception.CloudRuntimeException;
+import com.cloud.utils.fsm.StateMachine2;
 import com.cloud.utils.net.NetUtils;
 import com.cloud.vm.DomainRouterVO;
 import com.cloud.vm.Nic;
@@ -1479,6 +1480,13 @@ public class VpcVirtualNetworkApplianceManagerImpl extends VirtualNetworkApplian
                     router.getDataCenterId());
         }
 
+        return true;
+    }
+
+    @Override
+    public boolean postStateTransitionEvent(StateMachine2.Transition<State, VirtualMachine.Event> transition, VirtualMachine vo, boolean status, Object opaque) {
+        // Without this VirtualNetworkApplianceManagerImpl.postStateTransitionEvent() gets called twice as part of listeners -
+        // once from VpcVirtualNetworkApplianceManagerImpl and once from VirtualNetworkApplianceManagerImpl itself
         return true;
     }
 }

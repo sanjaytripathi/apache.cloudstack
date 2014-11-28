@@ -4471,19 +4471,30 @@ VirtualMachineGuru, Listener, Configurable, StateListener<State, VirtualMachine.
 
     @Override
     public boolean postStateTransitionEvent(StateMachine2.Transition<State, VirtualMachine.Event> transition, VirtualMachine vo, boolean status, Object opaque) {
-      State oldState = transition.getCurrentState();
-      State newState = transition.getToState();
-      VirtualMachine.Event event = transition.getEvent();
-      if (oldState == State.Stopped && event == VirtualMachine.Event.FollowAgentPowerOnReport && newState == State.Running) {
-        if (vo.getType() == VirtualMachine.Type.DomainRouter) {
-          s_logger.info("Schedule a router reboot task as router " + vo.getId() + " is powered-on out-of-band. we need to reboot to refresh network rules");
-          _executor.schedule(new RebootTask(vo.getId()), 1000, TimeUnit.MICROSECONDS);
+        State newState = transition.getToState();
+        VirtualMachine.Event event = transition.getEvent();
+        if (event == VirtualMachine.Event.FollowAgentPowerOnReport && newState == State.Running) {
+            if (vo.getType() == VirtualMachine.Type.DomainRouter) {
+                if (opaque != null && opaque instanceof Pair<?, ?>) {
+                    Pair<?, ?> pair = (Pair<?, ?>)opaque;
+                    Object first = pair.first();
+                    Object second = pair.second();
+                    if (first != null && second != null && first instanceof Long && second instanceof Long) {
+                        Long hostId = (Long)first;
+                        Long powerHostId = (Long)second;
+                        // If VM host known to CS is different from 'PowerOn' report host, then it is out-of-band movement
+                        if (hostId.longValue() != powerHostId.longValue()) {
+                            s_logger.info("Schedule a router reboot task as router " + vo.getId() + " is powered-on out-of-band, need to reboot to refresh network rules");
+                            _executor.schedule(new RebootTask(vo.getId()), 1000, TimeUnit.MICROSECONDS);
+                        }
+                    }
+                }
+            }
         }
-      }
-      return true;
+        return true;
     }
 
-  protected class RebootTask extends ManagedContextRunnable {
+    protected class RebootTask extends ManagedContextRunnable {
 
         long _routerId;
 
