@@ -1505,7 +1505,7 @@
                                         label: 'label.status'
                                     },
                                     diskofferingdisplaytext: {
-                                    	label: 'Disk Offering'
+                                        label: 'label.disk.offering'
                                     },
                                     type: {
                                         label: 'label.type'
