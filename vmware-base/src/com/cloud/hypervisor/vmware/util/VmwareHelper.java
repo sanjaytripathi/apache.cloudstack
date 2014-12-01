@@ -194,8 +194,6 @@ public class VmwareHelper {
             controllerKey = ideControllerKey;
         if (deviceNumber < 0) {
             deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
-            if (controllerKey != ideControllerKey && isReservedScsiDeviceNumber(deviceNumber))
-                deviceNumber++;
         }
         disk.setControllerKey(controllerKey);
 
@@ -267,8 +265,6 @@ public class VmwareHelper {
         disk.setControllerKey(controllerKey);
         if (deviceNumber < 0) {
             deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
-            if (controllerKey != ideControllerKey && isReservedScsiDeviceNumber(deviceNumber))
-                deviceNumber++;
         }
 
         disk.setKey(-contextNumber);
@@ -306,8 +302,6 @@ public class VmwareHelper {
                 controllerKey = ideControllerKey;
             if (deviceNumber < 0) {
                 deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
-                if (controllerKey != ideControllerKey && isReservedScsiDeviceNumber(deviceNumber))
-                    deviceNumber++;
             }
 
             disk.setControllerKey(controllerKey);
@@ -360,8 +354,6 @@ public class VmwareHelper {
             controllerKey = ideControllerKey;
         if (deviceNumber < 0) {
             deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
-            if (controllerKey != ideControllerKey && isReservedScsiDeviceNumber(deviceNumber))
-                deviceNumber++;
         }
 
         disk.setControllerKey(controllerKey);
