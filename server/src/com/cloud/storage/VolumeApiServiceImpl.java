@@ -1382,6 +1382,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
                     throw (ConcurrentOperationException)jobResult;
                 else if (jobResult instanceof InvalidParameterValueException)
                     throw (InvalidParameterValueException)jobResult;
+                else if (jobResult instanceof RuntimeException)
+                    throw (RuntimeException)jobResult;
                 else if (jobResult instanceof Throwable)
                     throw new RuntimeException("Unexpected exception", (Throwable)jobResult);
                 else if (jobResult instanceof Long) {
@@ -1585,6 +1587,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             if (jobResult != null) {
                 if (jobResult instanceof ConcurrentOperationException)
                     throw (ConcurrentOperationException)jobResult;
+                else if (jobResult instanceof RuntimeException)
+                    throw (RuntimeException)jobResult;
                 else if (jobResult instanceof Throwable)
                     throw new RuntimeException("Unexpected exception", (Throwable)jobResult);
                 else if (jobResult instanceof Long) {
