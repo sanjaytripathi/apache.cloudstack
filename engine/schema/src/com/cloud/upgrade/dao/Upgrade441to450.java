@@ -297,7 +297,7 @@ public class Upgrade441to450 implements DbUpgrade {
                             } else {
                                 s_logger.warn("4.5.0 " + hypervisorAndTemplateName.getKey() + " SystemVm template not found. " + hypervisorAndTemplateName.getKey() + " hypervisor is not used, so not failing upgrade");
                                 // Update the latest template URLs for corresponding hypervisor
-                                try (PreparedStatement update_pstmt = conn.prepareStatement("UPDATE `cloud`.`vm_template` SET url = ? , checksum = ? WHERE hypervisor_type = ? AND type = 'SYSTEM' AND removed is null order by id desc limit 1");) {
+                                try (PreparedStatement update_pstmt = conn.prepareStatement("UPDATE `cloud`.`vm_template` SET url = ? , checksum = ? , guest_os_id = 184 WHERE hypervisor_type = ? AND type = 'SYSTEM' AND removed is null order by id desc limit 1");) {
                                     update_pstmt.setString(1, newTemplateUrl.get(hypervisorAndTemplateName.getKey()));
                                     update_pstmt.setString(2, newTemplateChecksum.get(hypervisorAndTemplateName.getKey()));
                                     update_pstmt.setString(3, hypervisorAndTemplateName.getKey().toString());
