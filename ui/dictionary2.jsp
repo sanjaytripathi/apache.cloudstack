@@ -1035,6 +1035,7 @@ $.extend(dictionary, {
 'label.delete.baremetal.rack.configuration': '<fmt:message key="label.delete.baremetal.rack.configuration" />',
 'message.confirm.delete.baremetal.rack.configuration': '<fmt:message key="message.confirm.delete.baremetal.rack.configuration" />',
 'message.added.new.nuage.vsp.controller': '<fmt:message key="message.added.new.nuage.vsp.controller" />',
-'message.added.vpc.offering': '<fmt:message key="message.added.vpc.offering" />'
+'message.added.vpc.offering': '<fmt:message key="message.added.vpc.offering" />',
+'label.add.private.gateway': '<fmt:message key="label.add.private.gateway" />'
 });
 </script>
