@@ -44,6 +44,7 @@ import javax.naming.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Component;
 
+import org.apache.cloudstack.alert.AlertService;
 import org.apache.cloudstack.api.command.admin.storage.CancelPrimaryStorageMaintenanceCmd;
 import org.apache.cloudstack.api.command.admin.storage.CreateSecondaryStagingStoreCmd;
 import org.apache.cloudstack.api.command.admin.storage.CreateStoragePoolCmd;
@@ -96,6 +97,7 @@ import com.cloud.agent.api.Answer;
 import com.cloud.agent.api.Command;
 import com.cloud.agent.api.StoragePoolInfo;
 import com.cloud.agent.manager.Commands;
+import com.cloud.alert.AlertManager;
 import com.cloud.api.ApiDBUtils;
 import com.cloud.api.query.dao.TemplateJoinDao;
 import com.cloud.api.query.vo.TemplateJoinVO;
@@ -266,6 +268,8 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     private TemplateService _imageSrv;
     @Inject
     EndPointSelector _epSelector;
+    @Inject
+    AlertManager _alertManager;
 
     protected List<StoragePoolDiscoverer> _discoverers;
 
@@ -900,6 +904,11 @@ public class StorageManagerImpl extends ManagerBase implements StorageManager, C
     @Override
     public BigDecimal getStorageOverProvisioningFactor(Long dcId) {
         return new BigDecimal(CapacityManager.StorageOverprovisioningFactor.valueIn(dcId));
+    }
+
+    @Override
+    public void sendAlert(long dcId, long podId, String subject, String body) {
+        _alertManager.sendAlert(AlertService.AlertType.ALERT_TYPE_STORAGE, dcId, podId, subject, body);
     }
 
     @Override

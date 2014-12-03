@@ -116,4 +116,6 @@ public interface StorageManager extends StorageService {
     Long getDiskIopsWriteRate(ServiceOfferingVO offering, DiskOfferingVO diskOffering);
 
     void cleanupDownloadUrls();
+
+    void sendAlert(long dcId, long podId, String subject, String body);
 }
