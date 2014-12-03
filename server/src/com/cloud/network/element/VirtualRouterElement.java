@@ -247,9 +247,9 @@ NetworkMigrationResponder, AggregatedCommandExecutor {
             }
 
             if (rules != null && rules.size() == 1) {
-                // for VR no need to add default egress rule to DENY traffic
+                // for VR no need to add default egress rule to Allow traffic
                 if (rules.get(0).getTrafficType() == FirewallRule.TrafficType.Egress && rules.get(0).getType() == FirewallRule.FirewallRuleType.System &&
-                        !_networkMdl.getNetworkEgressDefaultPolicy(config.getId()))
+                        _networkMdl.getNetworkEgressDefaultPolicy(config.getId()))
                     return true;
             }
 
