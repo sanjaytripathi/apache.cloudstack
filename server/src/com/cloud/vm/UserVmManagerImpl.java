@@ -1017,6 +1017,8 @@ public class UserVmManagerImpl extends ManagerBase implements UserVmManager, Vir
 
         NicProfile profile = new NicProfile(null, null);
         if (ipAddress != null) {
+            if (!NetUtils.isValidIp(ipAddress))
+                throw new InvalidParameterValueException("Invalid format for the ip address parameter");
             profile = new NicProfile(ipAddress, null);
         }
 

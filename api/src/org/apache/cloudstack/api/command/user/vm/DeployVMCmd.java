@@ -300,8 +300,8 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
     }
 
     public List<Long> getNetworkIds() {
-       if (ipToNetworkList != null) {
-           if (networkIds != null || ipAddress != null || getIp6Address() != null) {
+        if (ipToNetworkList != null && !ipToNetworkList.isEmpty()) {
+            if ((networkIds != null && !networkIds.isEmpty()) || ipAddress != null || getIp6Address() != null) {
                throw new InvalidParameterValueException("ipToNetworkMap can't be specified along with networkIds or ipAddress");
            } else {
                List<Long> networks = new ArrayList<Long>();
@@ -351,6 +351,9 @@ public class DeployVMCmd extends BaseAsyncCreateCustomIdCmd {
                     }
                 }
                 String requestedIp = ips.get("ip");
+                if(requestedIp != null && !requestedIp.isEmpty() && !NetUtils.isValidIp(requestedIp)) {
+                    throw new InvalidParameterValueException("IPs in IpToNetworkList is not valid");
+                }
                 String requestedIpv6 = ips.get("ipv6");
                 if (requestedIpv6 != null) {
                     requestedIpv6 = NetUtils.standardizeIp6Address(requestedIpv6);
