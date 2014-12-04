@@ -3669,7 +3669,7 @@
                                                         if (selectedVMs != null) {
                                                         	var vmidipmapIndex = 0;
                                                     		for (var vmIndex = 0; vmIndex < selectedVMs.length; vmIndex++) {
-                                                                inputData['vmidipmap[' + vmidipmapIndex + '].vmid'] = selectedVMs[vmInde9x].id;
+                                                                inputData['vmidipmap[' + vmidipmapIndex + '].vmid'] = selectedVMs[vmIndex].id;
                                                                 inputData['vmidipmap[' + vmidipmapIndex + '].vmip'] = selectedVMs[vmIndex]._subselect;
                                                     		}
                                                     	}
