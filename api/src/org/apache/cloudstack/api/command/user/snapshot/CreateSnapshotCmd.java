@@ -190,7 +190,7 @@ public class CreateSnapshotCmd extends BaseAsyncCreateCmd {
     @Override
     public void execute() {
         s_logger.info("VOLSS: createSnapshotCmd starts:" + System.currentTimeMillis());
-        CallContext.current().setEventDetails("Volume Id: " + getVolumeId());
+        CallContext.current().setEventDetails("Volume Id: " + getVolumeUUId());
         Snapshot snapshot;
         try {
             snapshot =
