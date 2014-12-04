@@ -1916,7 +1916,7 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
 
     int getReservedCpuMHZ(VirtualMachineTO vmSpec) {
          if (vmSpec.getDetails().get(VMwareGuru.VmwareReserveCpu.key()).equalsIgnoreCase("true")) {
-             return vmSpec.getMinSpeed();
+             return vmSpec.getMinSpeed() * vmSpec.getCpus();
          }
          return 0;
     }
