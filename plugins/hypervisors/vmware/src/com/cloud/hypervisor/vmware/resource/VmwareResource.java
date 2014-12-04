@@ -593,6 +593,13 @@ public class VmwareResource implements StoragePoolResource, ServerResource, Vmwa
                     s_logger.trace("resize volume done (failed)");
                 throw new Exception("No such disk device: " + path);
             }
+            // IDE virtual disk cannot be re-sized if VM is running
+            if (vdisk.second() != null && vdisk.second().contains("ide")) {
+                if (vmMo.getPowerState() == VirtualMachinePowerState.POWERED_ON) {
+                    throw new Exception("Re-sizing a virtual disk over IDE controller is not supported while VM is running in VMware hypervisor. " +
+                            "Please re-try when virtual disk is attached to a VM which is not running.");
+                }
+            }
             VirtualDisk disk = vdisk.first();
             String vmdkAbsFile = getAbsoluteVmdkFile(disk);
             if (vmdkAbsFile != null && !vmdkAbsFile.isEmpty()) {
