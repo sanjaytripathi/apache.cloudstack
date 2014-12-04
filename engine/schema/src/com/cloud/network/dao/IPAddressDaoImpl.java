@@ -69,6 +69,7 @@ public class IPAddressDaoImpl extends GenericDaoBase<IPAddressVO, Long> implemen
 
     // make it public for JUnit test
     public IPAddressDaoImpl() {
+        _count = "select count(distinct user_ip_address.id) from user_ip_address WHERE ";
     }
 
     @PostConstruct
