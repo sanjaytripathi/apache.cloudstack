@@ -373,7 +373,7 @@ def allow_egress_traffic(session):
 
 def ipset(ipsetname, proto, start, end, ips):
     try:
-        util.pread2(['ipset', '-N', ipsetname, 'iphash'])
+        util.pread2(['ipset', '-N', ipsetname, 'nethash'])
     except:
         logging.debug("ipset chain already exists" + ipsetname)
 
@@ -381,7 +381,7 @@ def ipset(ipsetname, proto, start, end, ips):
     ipsettmp = ''.join(''.join(ipsetname.split('-')).split('_')) + str(int(time.time()) % 1000)
 
     try: 
-        util.pread2(['ipset', '-N', ipsettmp, 'iphash']) 
+        util.pread2(['ipset', '-N', ipsettmp, 'nethash']) 
     except:
         logging.debug("Failed to create temp ipset, reusing old name= " + ipsettmp)
         try: 
@@ -690,10 +690,10 @@ def create_ipset_forvm (ipsetname):
         logging.debug("Creating ipset chain .... " + ipsetname)
         util.pread2(['ipset', '-F', ipsetname])
         util.pread2(['ipset', '-X', ipsetname])
-        util.pread2(['ipset', '-N', ipsetname, 'iphash'])
+        util.pread2(['ipset', '-N', ipsetname, 'nethash'])
     except:
         logging.debug("ipset chain not exists creating.... " + ipsetname)
-        util.pread2(['ipset', '-N', ipsetname, 'iphash'])
+        util.pread2(['ipset', '-N', ipsetname, 'nethash'])
 
     return result
 
@@ -1274,7 +1274,7 @@ def inflate_rules (zipped):
 def cache_ipset_keyword():
     tmpname = 'ipsetqzvxtmp'
     try:
-        util.pread2(['/bin/bash', '-c', 'ipset -N ' + tmpname + ' iphash'])
+        util.pread2(['/bin/bash', '-c', 'ipset -N ' + tmpname + ' nethash'])
     except:
         util.pread2(['/bin/bash', '-c', 'ipset -F ' + tmpname])
 
