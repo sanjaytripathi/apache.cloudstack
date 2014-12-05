@@ -685,8 +685,14 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
                     ") <= memory-dynamic-min(" + newDynamicMemoryMin + ") <= memory-dynamic-max(" + newDynamicMemoryMax + ") <= memory-static-max(" + staticMemoryMax + ")");
         }
 
+        // On Xenserver windows VM need restart of VM to change the VCPU value. So instead of putting Windows specific check we set the VCPU value only if needed.
+        Long newVCPUsAtStartup = (long) vmSpec.getCpus();
+        Long VCPUsAtStartup = vm.getVCPUsAtStartup(conn);
+        if(newVCPUsAtStartup > VCPUsAtStartup) {
+            vm.setVCPUsNumberLive(conn, newVCPUsAtStartup);
+        }
+
         vm.setMemoryDynamicRange(conn, newDynamicMemoryMin, newDynamicMemoryMax);
-        vm.setVCPUsNumberLive(conn, (long)vmSpec.getCpus());
 
         Integer speed = vmSpec.getMinSpeed();
         if (speed != null) {
@@ -702,7 +708,7 @@ public abstract class CitrixResourceBase implements ServerResource, HypervisorRe
 
             if (vmSpec.getLimitCpuUse()) {
                 long utilization = 0; // max CPU cap, default is unlimited
-                utilization = (int)((vmSpec.getMaxSpeed() * 0.99 * vmSpec.getCpus()) / _host.speed * 100);
+                utilization = (int)((vmSpec.getMaxSpeed() * 0.99 * newVCPUsAtStartup) / _host.speed * 100);
                 //vm.addToVCPUsParamsLive(conn, "cap", Long.toString(utilization)); currently xenserver doesnot support Xapi to add VCPUs params live.
                 callHostPlugin(conn, "vmops", "add_to_VCPUs_params_live", "key", "cap", "value", Long.toString(utilization), "vmname", vmSpec.getName());
             }
