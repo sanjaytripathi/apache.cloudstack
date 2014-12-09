@@ -104,12 +104,12 @@ public class XenserverSnapshotStrategy extends SnapshotStrategyBase {
         }
 
         // determine full snapshot backup or not
-
-
         boolean fullBackup = true;
         SnapshotDataStoreVO parentSnapshotOnBackupStore = snapshotStoreDao.findLatestSnapshotForVolume(snapshot.getVolumeId(), DataStoreRole.Image);
         HypervisorType hypervisorType = snapshot.getBaseVolume().getHypervisorType();
-        if (parentSnapshotOnBackupStore != null && hypervisorType == Hypervisor.HypervisorType.XenServer) { // CS does incremental backup only for XenServer
+        // Check for install path for migrated Vm with volumes.
+        if (parentSnapshotOnBackupStore != null && parentSnapshotOnBackupStore.getInstallPath() != null
+                && hypervisorType == Hypervisor.HypervisorType.XenServer) { // CS does incremental backup only for XenServer
             int _deltaSnapshotMax = NumbersUtil.parseInt(configDao.getValue("snapshot.delta.max"),
                     SnapshotManager.DELTAMAX);
             int deltaSnap = _deltaSnapshotMax;

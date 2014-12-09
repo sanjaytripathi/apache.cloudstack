@@ -57,6 +57,7 @@ import org.apache.cloudstack.framework.jobs.AsyncJobManager;
 import org.apache.cloudstack.framework.jobs.impl.AsyncJobVO;
 import org.apache.cloudstack.storage.command.CommandResult;
 import org.apache.cloudstack.storage.datastore.db.PrimaryDataStoreDao;
+import org.apache.cloudstack.storage.datastore.db.SnapshotDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.StoragePoolVO;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreDao;
 import org.apache.cloudstack.storage.datastore.db.TemplateDataStoreVO;
@@ -140,6 +141,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
     protected TemplateDataStoreDao _vmTemplateStoreDao = null;
     @Inject
     protected VolumeDao _volumeDao;
+    @Inject
+    protected SnapshotDataStoreDao _snapshotDataStoreDao;
     @Inject
     protected ResourceLimitService _resourceLimitMgr;
     @Inject
@@ -979,6 +982,11 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             if (result.isFailed()) {
                 s_logger.debug("Failed to migrated vm " + vm + " along with its volumes. " + result.getResult());
                 throw new CloudRuntimeException("Failed to migrated vm " + vm + " along with its volumes. ");
+            } else {
+                for (VolumeInfo volume : volumeMap.keySet()) {
+                    //check snapshots of root/datadisk volume and update the table for next snapshot as full snapshot.
+                    _snapshotDataStoreDao.updateEntriesForLiveMigratedVolume(volume.getId());
+                }
             }
         } catch (InterruptedException e) {
             s_logger.debug("Failed to migrated vm " + vm + " along with its volumes.", e);
@@ -1016,6 +1024,8 @@ public class VolumeOrchestrator extends ManagerBase implements VolumeOrchestrati
             if (result == null) {
                 return false;
             }
+            //check snapshots of root/datadisk volume and update the table for next snapshot as full snapshot.
+            _snapshotDataStoreDao.updateEntriesForLiveMigratedVolume(vol.getId());
         }
         return true;
     }

@@ -1839,6 +1839,8 @@ public class VolumeApiServiceImpl extends ManagerBase implements VolumeApiServic
             s_logger.debug("Failed to migrate volume", e);
             throw new CloudRuntimeException(e.getMessage());
         }
+        // remove snapshot entries on Primary (if any) and update the volumeId for snapshot on secondary
+        _snapshotMgr.updateEntriesForMigratedVolume(volumeId, newVol.getId());
         return newVol;
     }
 

@@ -1130,6 +1130,18 @@ public class SnapshotManagerImpl extends ManagerBase implements SnapshotManager,
         return snapshot;
     }
 
-
+    @Override
+    public void updateEntriesForMigratedVolume(long oldVolId, long newVolId) {
+        if (!_snapshotDao.listByVolumeId(oldVolId).isEmpty() && oldVolId != newVolId) {
+            if (oldVolId != newVolId) {
+                _snapshotDao.updateVolumeIds(oldVolId, newVolId);
+                _snapshotStoreDao.updateVolumeIds(oldVolId, newVolId);
+            }
+            SnapshotDataStoreVO snapshotOnPrimary = _snapshotStoreDao.findLatestSnapshotForVolume(newVolId, DataStoreRole.Primary);
+            if (snapshotOnPrimary != null) {
+                _snapshotStoreDao.remove(snapshotOnPrimary.getId());
+            }
+        }
+    }
 
 }

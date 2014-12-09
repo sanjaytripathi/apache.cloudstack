@@ -54,6 +54,7 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
     private SearchBuilder<SnapshotDataStoreVO> snapshotSearch;
     private SearchBuilder<SnapshotDataStoreVO> storeSnapshotSearch;
     private SearchBuilder<SnapshotDataStoreVO> snapshotIdSearch;
+    private SearchBuilder<SnapshotDataStoreVO> volumeIdSearch;
 
     private final String parentSearch = "select store_id, store_role, snapshot_id from cloud.snapshot_store_ref where store_id = ? "
         + " and store_role = ? and volume_id = ? and state = 'Ready'" + " order by created DESC " + " limit 1";
@@ -109,6 +110,10 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
         snapshotIdSearch = createSearchBuilder();
         snapshotIdSearch.and("snapshot_id", snapshotIdSearch.entity().getSnapshotId(), SearchCriteria.Op.EQ);
         snapshotIdSearch.done();
+
+        volumeIdSearch = createSearchBuilder();
+        volumeIdSearch.and("volume_id", volumeIdSearch.entity().getVolumeId(), SearchCriteria.Op.EQ);
+        volumeIdSearch.done();
 
         return true;
     }
@@ -367,4 +372,29 @@ public class SnapshotDataStoreDaoImpl extends GenericDaoBase<SnapshotDataStoreVO
         }
     }
 
+    @Override
+    public void updateVolumeIds(long oldVolId, long newVolId) {
+        SearchCriteria<SnapshotDataStoreVO> sc = volumeIdSearch.create();
+        sc.setParameters("volume_id", oldVolId);
+        SnapshotDataStoreVO snapshot = createForUpdate();
+        snapshot.setVolumeId(newVolId);
+        UpdateBuilder ub = getUpdateBuilder(snapshot);
+        update(ub, sc, null);
+    }
+
+    @Override
+    public void updateEntriesForLiveMigratedVolume(long volumeId) {
+        SnapshotDataStoreVO snapshotOnPrimary = findLatestSnapshotForVolume(volumeId, DataStoreRole.Primary);
+        if (snapshotOnPrimary != null) {
+            s_logger.info("Persisting a snapshot entry in snapshot_store_ref for volume " + volumeId);
+            SnapshotDataStoreVO ss = new SnapshotDataStoreVO();
+            ss.setSnapshotId(snapshotOnPrimary.getSnapshotId());
+            ss.setDataStoreId(snapshotOnPrimary.getDataStoreId());
+            ss.setRole(DataStoreRole.Image);
+            ss.setVolumeId(volumeId);
+            ss.setState(ObjectInDataStoreStateMachine.State.Failed);
+            persist(ss);
+            remove(snapshotOnPrimary.getId());
+        }
+    }
 }
